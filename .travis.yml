@@ -1,0 +1,32 @@
+sudo: required
+dist: trusty
+language: cpp
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-5
+      - build-essential
+      - autoconf
+      - libtool
+      - pkg-config
+      - libboost-all-dev
+
+install:
+  - export CC=gcc-5
+  - export CXX=g++-5
+  - ./script/install-grpc.sh
+
+matrix:
+  include:
+    - compiler: gcc
+      env: COMPILER=g++-5
+    - compiler: clang
+      env: COMPILER=clang++
+
+script:
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. && make
