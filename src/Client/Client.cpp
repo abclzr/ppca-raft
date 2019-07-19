@@ -49,7 +49,7 @@ decltype(auto) timeFrom(const Tp & tp) {
 void Client::Put(std::string key, std::string value, uint64_t timeout) {
   auto startTimePoint = std::chrono::system_clock::now();
 
-  while (timeFrom(startTimePoint) <= timeout) {
+  while ((uint64_t)timeFrom(startTimePoint) <= timeout) {
     auto & stub = pImpl->stubs[pImpl->cur % pImpl->stubs.size()];
     grpc::ClientContext ctx;
     ctx.set_deadline(startTimePoint + std::chrono::milliseconds(timeout));
@@ -72,7 +72,7 @@ void Client::Put(std::string key, std::string value, uint64_t timeout) {
 std::string Client::Get(std::string key, uint64_t timeout) {
   auto startTimePoint = std::chrono::system_clock::now();
 
-  while (timeFrom(startTimePoint) <= timeout) {
+  while ((uint64_t)timeFrom(startTimePoint) <= timeout) {
     auto & stub = pImpl->stubs[pImpl->cur % pImpl->stubs.size()];
     grpc::ClientContext ctx;
     ctx.set_deadline(startTimePoint + std::chrono::milliseconds(timeout));
