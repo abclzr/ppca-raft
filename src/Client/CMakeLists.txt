@@ -1,5 +1,5 @@
 add_library(${PROJECT_NAME}-client
-  ${CMAKE_SOURCE_DIR}/include/raft/Client/client.h
+  ${CMAKE_SOURCE_DIR}/include/raft/Client/Client.h
   Client.cpp
   )
 
