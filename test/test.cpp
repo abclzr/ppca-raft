@@ -1,8 +1,6 @@
-#define BOOST_TEST_MODULE Test PPCA Raft
-#define BOOST_TEST_DYN_LINK
-#include <boost/test/unit_test.hpp>
+#include <iostream>
 
-BOOST_AUTO_TEST_CASE(HelloWorld) {
-  BOOST_TEST_MESSAGE("Test::Hello World!");
-  BOOST_REQUIRE(true);
+int main() {
+  std::cout << "Hello, world!" << std::endl;
+  return 0;
 }

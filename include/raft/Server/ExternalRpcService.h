@@ -7,42 +7,32 @@
 #include <grpc++/server.h>
 #include <grpc++/server_builder.h>
 
-#include "common/rpc/external.grpc.pb.h"
+#include "raft/Common/external.grpc.pb.h"
 
-namespace ppca {
+namespace raft {
 
 class ExternalRpcService : public rpc::External::Service {
 public:
-  template <class Func>
-  void bindPut(Func && f) { put = std::forward<Func>(f); }
+  template <class Func> void bindPut(Func &&f) { put = std::forward<Func>(f); }
 
-  template <class Func>
-  void bindGet(Func && f) { get = std::forward<Func>(f); }
+  template <class Func> void bindGet(Func &&f) { get = std::forward<Func>(f); }
 
-  grpc::Status Put(grpc::ServerContext *context,
-                   const rpc::PutRequest *request,
-                   rpc::PutReply *response) override {
-    put(request->key(), request->value());
-    return grpc::Status::OK;
-  }
+  grpc::Status Put(grpc::ServerContext *context, const rpc::PutRequest *request,
+                   rpc::PutReply *response) override;
 
-  grpc::Status Get(grpc::ServerContext * context,
-                   const rpc::GetRequest *request,
-                   rpc::GetReply * response) override  {
-    response->set_value(get(request->key()));
-    return grpc::Status::OK;
-  }
+  grpc::Status Get(grpc::ServerContext *context, const rpc::GetRequest *request,
+                   rpc::GetReply *response) override;
 
 private:
   std::function<void(std::string, std::string)> put;
   std::function<std::string(std::string)> get;
 };
 
-} // namespace ppca
+} // namespace raft
 
 /* Example:
  *
- * namespace ppca {
+ * namespace raft {
  *
  * class ExternalRpcServer {
  * public:
@@ -57,25 +47,23 @@ private:
  *   grpc::ServerBuilder builder;
  *   builder.AddListeningPort(addr, grpc::InsecureServerCredentials());
  *   builder.RegisterService(&service);
- *   server = builder.BuildAndStart();
- *   runningThread = std::thread([this] { server->Wait(); });
+ *   Server = builder.BuildAndStart();
+ *   runningThread = std::thread([this] { Server->Wait(); });
  * }
  *
  * void Shutdown() {
- *   if (server)
- *     server->Shutdown();
+ *   if (Server)
+ *     Server->Shutdown();
  *   runningThread.join();
  * }
  *
  * private:
  * ExternalRpcService service;
- * std::unique_ptr<grpc::Server> server;
+ * std::unique_ptr<grpc::Server> Server;
  * std::thread runningThread;
- * }; // class
+ * };
  *
- * } // namespace ppca
+ * } // namespace rafr
  */
 
-
-
-#endif //PPCA_RAFT_EXTERNAL_RPC_SERVICE_H
+#endif // PPCA_RAFT_EXTERNAL_RPC_SERVICE_H

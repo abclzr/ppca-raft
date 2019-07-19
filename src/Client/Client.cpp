@@ -1,4 +1,4 @@
-#include "client/client.h"
+#include "raft/Client/Client.h"
 
 #include <atomic>
 #include <vector>
@@ -9,9 +9,9 @@
 
 #include <grpc++/create_channel.h>
 
-#include "common/rpc/external.grpc.pb.h"
+#include "raft/Common/external.grpc.pb.h"
 
-namespace ppca {
+namespace raft {
 
 struct Client::Impl {
   std::vector<std::unique_ptr<rpc::External::Stub>> stubs;
@@ -21,7 +21,7 @@ struct Client::Impl {
 
 } // namespace ppca
 
-namespace ppca {
+namespace raft {
 
 Client::Client(const std::string &filename) : pImpl(std::make_unique<Impl>()) {
   namespace pt = boost::property_tree;

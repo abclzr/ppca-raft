@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package ppca.rpc;
+package raft.rpc;
 
 message PutRequest {
   string key = 1;

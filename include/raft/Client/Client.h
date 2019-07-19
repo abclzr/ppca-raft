@@ -6,13 +6,13 @@
 #include <string>
 #include <exception>
 
-namespace ppca {
+namespace raft {
 
 class RequestTimeout : public std::exception {};
 
 class Client {
 public:
-  Client(const std::string & filename);
+  explicit Client(const std::string & filename);
   Client(const Client &) = delete;
   Client(Client &&) = delete;
   Client& operator=(const Client &) = delete;

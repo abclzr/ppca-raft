@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
-protoc -I=. --cpp_out=../src/common/rpc external.proto
-protoc -I=. --grpc_out=../src/common/rpc \
+protoc -I=. --cpp_out=../src/Common/ external.proto
+protoc -I=. --grpc_out=../src/Common/ \
   --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` external.proto
-
-#protoc -I=. --cpp_out=../src/server/rpc internal.proto
-#protoc -I=. --grpc_out=../src/server/rpc \
-#  --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` internal.proto
+mv ../src/Common/external.grpc.pb.h ../include/raft/Common/
+mv ../src/Common/external.pb.h ../include/raft/Common/

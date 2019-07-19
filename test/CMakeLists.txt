@@ -1,12 +1,7 @@
-file(GLOB TEST_SOURCE ${CMAKE_CURRENT_LIST_DIR}/*.cpp)
-
-add_executable(${PROJECT_NAME}_test ${TEST_SOURCE})
+add_executable(${PROJECT_NAME}-test test.cpp)
 
 # link
-target_link_libraries(
-  ${PROJECT_NAME}_test
-  ${Boost_LIBRARIES}
-)
+target_link_libraries(${PROJECT_NAME}-test
+  PRIVATE ${PROJECT_NAME}-client ${PROJECT_NAME}-server
+  )
 
-# config
-add_definitions(-DCMAKE_SOURCE_DIR="${CMAKE_SOURCE_DIR}")
