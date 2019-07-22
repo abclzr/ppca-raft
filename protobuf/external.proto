@@ -25,4 +25,3 @@ service External {
 
   rpc Get (GetRequest) returns (GetReply) {}
 }
-

@@ -2,6 +2,8 @@ set(SERVER_SRC
   ${CMAKE_SOURCE_DIR}/include/raft/Server/ExternalRpcService.h
 
   ExternalRpcService.cpp
+        Server.cpp
+        RaftRpcService.cpp
   )
 
 add_library(${PROJECT_NAME}-server ${SERVER_SRC})
