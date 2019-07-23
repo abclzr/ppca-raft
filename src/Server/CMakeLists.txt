@@ -13,3 +13,7 @@ target_include_directories(${PROJECT_NAME}-server
   PUBLIC ${CMAKE_SOURCE_DIR}/include/)
 target_link_libraries(${PROJECT_NAME}-server PUBLIC ${PROJECT_NAME}-common)
 target_compile_options(${PROJECT_NAME}-server PRIVATE -o2 -Wall -pthread)
+
+find_package(Boost REQUIRED COMPONENTS thread)
+target_include_directories(${PROJECT_NAME}-server PRIVATE ${Boost_INCLUDE_DIR})
+target_link_libraries(${PROJECT_NAME}-server PUBLIC ${Boost_LIBRARIES})

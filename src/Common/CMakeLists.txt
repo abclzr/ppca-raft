@@ -3,6 +3,8 @@ add_library(${PROJECT_NAME}-common
   ${CMAKE_SOURCE_DIR}/include/raft/Common/external.pb.h
   external.grpc.pb.cc
   external.pb.cc
+  raft.grpc.pb.cc
+  raft.pb.cc
   )
 
 target_compile_features(${PROJECT_NAME}-common PUBLIC cxx_std_14)

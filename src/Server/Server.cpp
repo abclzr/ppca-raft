@@ -27,11 +27,7 @@ namespace raft {
         }
     }
 
-    Server::~Server() {
-
-    }
-
-    void Server::send(const std::unique_ptr<rpc::RaftRpc::Stub> &p, const std::string &k, const std::string &v) {
+    void Server::sendAppendEntriesMessage(const std::unique_ptr<rpc::RaftRpc::Stub> &p, const std::string &k, const std::string &v) {
         grpc::ClientContext context;
         rpc::AppendEntriesMessage request;
         rpc::Reply reply;
@@ -39,13 +35,15 @@ namespace raft {
         rpc::Entry *entry = request.add_entries();
         entry->set_key(k); entry->set_args(v);
 
+        reply.set_ans(false);
+
         p->AppendEntries(&context, request, &reply);
     }
 
     void Server::put(std::string k, std::string v) {
         table[k] = v;
         for (const auto &p : pImpl->stubs) {
-            send(p, k, v);
+            sendAppendEntriesMessage(p, k, v);
         }
     }
 
@@ -55,32 +53,40 @@ namespace raft {
 
     void Server::RunExternal() {
         ExternalRpcService service;
+        /*
         service.bindGet(std::bind(&Server::get, this, _1));
         service.bindPut(std::bind(&Server::put, this, _1, _2));
-        /*
+        */
         service.bindGet([this](std::string k) {
             return get(k);
         });
         service.bindPut([this](std::string k, std::string v) {
             put(k, v);
         });
-        */
         grpc::ServerBuilder builder;
         builder.AddListeningPort(local_address, grpc::InsecureServerCredentials());
         builder.RegisterService(&service);
-        std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
-        server->Wait();
+        serverExternal = builder.BuildAndStart();
+        serverExternal->Wait();
     }
 
     void Server::RunRaft() {
         RaftRpcService service;
+        /*
         service.bindAppend(std::bind(&Server::append, this, _1, _2));
         service.bindVote(std::bind(&Server::vote, this, _1, _2));
+        */
+        service.bindAppend([this](const rpc::AppendEntriesMessage *request, rpc::Reply *reply) {
+            append(request, reply);
+        });
+        service.bindVote([this](const rpc::RequestVoteMessage *request, rpc::Reply *reply) {
+            vote(request, reply);
+        });
         grpc::ServerBuilder builder;
         builder.AddListeningPort(local_address, grpc::InsecureServerCredentials());
         builder.RegisterService(&service);
-        std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
-        server->Wait();
+        serverRaft = builder.BuildAndStart();
+        serverRaft->Wait();
     }
 
     void Server::append(const rpc::AppendEntriesMessage *request, rpc::Reply *reply) {
@@ -95,8 +101,21 @@ namespace raft {
     }
 
     void Server::Run() {
-        boost::thread t1(RunExternal());
+        boost::function0<void> f1 = boost::bind(&Server::RunExternal, this);
+        boost::function0<void> f2 = boost::bind(&Server::RunExternal, this);
+        boost::thread t1(f1);
+        boost::thread t2(f2);
 
+        boost::unique_lock<boost::mutex> lock(mu);
+        while (!work_is_done) cv.wait(lock);
+
+        serverExternal->Shutdown();
+        serverRaft->Shutdown();
+        t1.join();
+        t2.join();
     }
 
+    Server::~Server() {
+        for (auto & i : table) std::cout << i.first << " " << i.second << std::endl;
+    }
 }

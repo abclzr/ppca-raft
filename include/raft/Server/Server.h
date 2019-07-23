@@ -15,6 +15,7 @@
 #include "raft/Common/raft.pb.h"
 #include "raft/Common/raft.grpc.pb.h"
 #include <boost/thread.hpp>
+#include <boost/bind.hpp>
 
 namespace raft {
 
@@ -25,7 +26,7 @@ namespace raft {
         std::unique_ptr<Impl> pImpl;
         std::string local_address;
 
-        void send(const std::unique_ptr<rpc::RaftRpc::Stub> &, const std::string &, const std::string &);
+        void sendAppendEntriesMessage(const std::unique_ptr<rpc::RaftRpc::Stub> &, const std::string &, const std::string &);
 
         void put(std::string, std::string);
         std::string get(std::string);
@@ -38,8 +39,14 @@ namespace raft {
         void RunExternal();
         void RunRaft();
         void Run();
-        void Stop();
         ~Server();
+
+        std::unique_ptr<grpc::Server> serverExternal;
+        std::unique_ptr<grpc::Server> serverRaft;
+
+        boost::condition_variable cv;
+        boost::mutex mu;
+        bool work_is_done;
     };
 
 }
