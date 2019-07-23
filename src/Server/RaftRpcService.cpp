@@ -8,11 +8,13 @@ namespace raft {
 
     grpc::Status RaftRpcService::AppendEntries(grpc::ServerContext *context, const rpc::AppendEntriesMessage *request,
                                                rpc::Reply *reply) {
+        append(request, reply);
         return grpc::Status::OK;
     }
 
     grpc::Status RaftRpcService::RequestVote(grpc::ServerContext *context, const rpc::RequestVoteMessage *request,
                                              rpc::Reply *reply) {
+        vote(request, reply);
         return grpc::Status::OK;
     }
 }

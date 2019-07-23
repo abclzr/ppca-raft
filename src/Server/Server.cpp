@@ -31,10 +31,21 @@ namespace raft {
 
     }
 
+    void Server::send(const std::unique_ptr<rpc::RaftRpc::Stub> &p, const std::string &k, const std::string &v) {
+        grpc::ClientContext context;
+        rpc::AppendEntriesMessage request;
+        rpc::Reply reply;
+
+        rpc::Entry *entry = request.add_entries();
+        entry->set_key(k); entry->set_args(v);
+
+        p->AppendEntries(&context, request, &reply);
+    }
+
     void Server::put(std::string k, std::string v) {
         table[k] = v;
         for (const auto &p : pImpl->stubs) {
-
+            send(p, k, v);
         }
     }
 
@@ -44,12 +55,16 @@ namespace raft {
 
     void Server::RunExternal() {
         ExternalRpcService service;
+        service.bindGet(std::bind(&Server::get, this, _1));
+        service.bindPut(std::bind(&Server::put, this, _1, _2));
+        /*
         service.bindGet([this](std::string k) {
             return get(k);
         });
         service.bindPut([this](std::string k, std::string v) {
             put(k, v);
         });
+        */
         grpc::ServerBuilder builder;
         builder.AddListeningPort(local_address, grpc::InsecureServerCredentials());
         builder.RegisterService(&service);
@@ -58,7 +73,30 @@ namespace raft {
     }
 
     void Server::RunRaft() {
-        RaftRpc
+        RaftRpcService service;
+        service.bindAppend(std::bind(&Server::append, this, _1, _2));
+        service.bindVote(std::bind(&Server::vote, this, _1, _2));
+        grpc::ServerBuilder builder;
+        builder.AddListeningPort(local_address, grpc::InsecureServerCredentials());
+        builder.RegisterService(&service);
+        std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
+        server->Wait();
+    }
+
+    void Server::append(const rpc::AppendEntriesMessage *request, rpc::Reply *reply) {
+        const std::string &k = request->entries().begin()->key();
+        const std::string &v = request->entries().begin()->args();
+        table[k] = v;
+        reply->set_ans(true);
+    }
+
+    void Server::vote(const rpc::RequestVoteMessage *request, rpc::Reply *reply) {
+        reply->set_ans(true);
+    }
+
+    void Server::Run() {
+        boost::thread t1(RunExternal());
+
     }
 
 }
