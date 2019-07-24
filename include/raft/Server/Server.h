@@ -7,6 +7,7 @@
 
 #include <map>
 #include <string>
+#include <iostream>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <grpc++/create_channel.h>
@@ -34,6 +35,7 @@ namespace raft {
         void append(const rpc::AppendEntriesMessage *, rpc::Reply *);
         void vote(const rpc::RequestVoteMessage *, rpc::Reply *);
 
+
     public:
         Server(const std::string &filename);
         void RunExternal();
@@ -47,6 +49,23 @@ namespace raft {
         boost::condition_variable cv;
         boost::mutex mu;
         bool work_is_done;
+
+        uint64_t currentTerm;
+        uint64_t votedFor;
+        struct LogEntry {
+            uint64_t  term;
+            uint64_t index;
+            std::string key;
+            std::string args;
+            LogEntry(uint64_t, uint64_t, const std::string &, const std::string &);
+        };
+        std::vector<LogEntry> log;
+        uint64_t commitIndex;
+        uint64_t lasatApplied;
+        std::vector<uint64_t> nextIndex;
+        std::vector<uint64_t> matchIndex;
+
+        std::vector<LogEntry>::iterator findLog(uint64_t);
     };
 
 }

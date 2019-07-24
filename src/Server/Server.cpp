@@ -90,19 +90,47 @@ namespace raft {
     }
 
     void Server::append(const rpc::AppendEntriesMessage *request, rpc::Reply *reply) {
-        const std::string &k = request->entries().begin()->key();
-        const std::string &v = request->entries().begin()->args();
-        table[k] = v;
-        reply->set_ans(true);
+        //TODO: add heartbeat interrupt
+
+        reply->set_term(currentTerm);
+
+        if (request->term() < currentTerm) {reply->set_ans(false); return;}
+
+        auto it = findLog(request->prevlogindex());
+        if (it == log.end() || it->term != request->prevlogterm()) {reply->set_ans(false); return;}
+
+        auto leader_it = request->entries().begin();
+        uint64_t id = it->index;
+        while (leader_it != request->entries().end()) {
+            ++it;
+            if (it == log.end()) {
+                log.emplace_back(leader_it->term(), ++id, leader_it->key(), leader_it->args());
+                it = log.end();
+            } else {
+                if (it->term == leader_it->term()) {
+                    ++leader_it;
+                    ++id;
+                    continue;
+                }
+                it->term = leader_it->term();
+                it->index = ++id;
+                it->key = leader_it->key();
+                it->args = leader_it->args();
+            }
+            ++leader_it;
+        }
+
+        it = log.end(); --it;
+        if (request->leadercommit() > commitIndex)
+            commitIndex = std::min(request->leadercommit(), it->index);
     }
 
     void Server::vote(const rpc::RequestVoteMessage *request, rpc::Reply *reply) {
-        reply->set_ans(true);
     }
 
     void Server::Run() {
         boost::function0<void> f1 = boost::bind(&Server::RunExternal, this);
-        boost::function0<void> f2 = boost::bind(&Server::RunExternal, this);
+        boost::function0<void> f2 = boost::bind(&Server::RunRaft, this);
         boost::thread t1(f1);
         boost::thread t2(f2);
 
@@ -118,4 +146,17 @@ namespace raft {
     Server::~Server() {
         for (auto & i : table) std::cout << i.first << " " << i.second << std::endl;
     }
+
+    std::vector<raft::Server::LogEntry, std::allocator<raft::Server::LogEntry>>::iterator Server::findLog(uint64_t prevLogIndex) {
+        for (auto i = log.begin(); i != log.end(); ++i)
+            if (i->index == prevLogIndex)
+                return i;
+        return log.end();
+    }
+
+    Server::LogEntry::LogEntry(uint64_t _term, uint64_t _index, const std::string &_key, const std::string &_args)
+         : term(_term), index(_index), key(_key), args(_args) {}
+
+
+
 }
