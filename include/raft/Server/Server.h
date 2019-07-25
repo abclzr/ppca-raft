@@ -17,6 +17,7 @@
 #include "raft/Common/raft.grpc.pb.h"
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
+#include "HeartBeatController.h"
 
 namespace raft {
 
@@ -35,14 +36,20 @@ namespace raft {
         void append(const rpc::AppendEntriesMessage *, rpc::Reply *);
         void vote(const rpc::RequestVoteMessage *, rpc::Reply *);
 
+        uint64_t get_lastlogindex();
+        uint64_t get_lastlogterm();
 
     public:
         Server(const std::string &filename);
         void RunExternal();
         void RunRaft();
         void Run();
+        void Stop();
         ~Server();
 
+        boost::thread t1;
+        boost::thread t2;
+        
         std::unique_ptr<grpc::Server> serverExternal;
         std::unique_ptr<grpc::Server> serverRaft;
 
@@ -51,7 +58,7 @@ namespace raft {
         bool work_is_done;
 
         uint64_t currentTerm;
-        uint64_t votedFor;
+        std::string votedFor;
         struct LogEntry {
             uint64_t  term;
             uint64_t index;
@@ -65,6 +72,8 @@ namespace raft {
         std::vector<uint64_t> nextIndex;
         std::vector<uint64_t> matchIndex;
 
+        HeartBeatController heart;
+        
         std::vector<LogEntry>::iterator findLog(uint64_t);
     };
 
