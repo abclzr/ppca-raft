@@ -18,18 +18,40 @@ void raft::HeartBeatController::interrupt() {
 }
 
 void raft::HeartBeatController::loop() {
+    boost::this_thread::disable_interruption di;
     while (!work_is_done) {
         if (state == State::Follower) {
             try {
-
-            } catch (...) {
+                boost::this_thread::restore_interruption ri(di);
+                int randtime = ELECTION_TIME_OUT_DOWN + rand() % (ELECTION_TIME_OUT_UP - ELECTION_TIME_OUT_DOWN);
+                boost::this_thread::sleep_for(boost::chrono::milliseconds(randtime));
+            } catch (boost::thread_interrupted) {
+                state = State::Follower;
                 continue;
             }
+            state = State::Candidate;
         } else if (state == State::Leader) {
             try {
-
-            } catch (...) {
+                boost::this_thread::restore_interruption ri(di);
+                boost::this_thread::sleep_for(boost::chrono::milliseconds(HEARTBEAT_TIME_OUT));
+            } catch (boost::thread_interrupted) {
+                state = State::Follower;
                 continue;
+            }
+            sendHeartBeat();
+        } else if (state == State::Candidate) {
+            bool flag;
+            try {
+                flag = election(CANDIDATE_TIME_OUT);
+            } catch (boost::thread_interrupted) {
+                state = State::Follower;
+                continue;
+            }
+            if (flag) {
+                state = State::Leader;
+                declareleader();
+            } else {
+                state = State::Follower;
             }
         }
     }

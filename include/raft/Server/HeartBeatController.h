@@ -8,6 +8,8 @@
 #include "config.h"
 #include <functional>
 #include <boost/thread.hpp>
+#include <boost/chrono.hpp>
+#include <algorithm>
 
 namespace raft {
 
@@ -15,6 +17,10 @@ namespace raft {
     public:
         template<class Func>
         void bindElection(Func &&f) { election = std::forward<Func>(f); }
+        template<class Func>
+        void bindDeclareleader(Func &&f) { declareleader = std::forward<Func>(f); }
+        template<class Func>
+        void bindSendHeartBeat(Func &&f) { sendHeartBeat = std::forward<Func>(f); }
 
         void loop();
 
@@ -24,7 +30,10 @@ namespace raft {
 
         void Stop();
 
-        std::function<void()> election;
+        std::function<bool(uint64_t)> election;
+        std::function<void()> declareleader;
+        std::function<void()> sendHeartBeat;
+
         boost::thread th;
         bool work_is_done;
         State state;
