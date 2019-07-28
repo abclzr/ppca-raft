@@ -157,7 +157,7 @@ namespace raft {
                 log.emplace_back(leader_it.term(), id, leader_it.key(), leader_it.args());
             }
 
-            if (request->leadercommit() > commitIndex)
+            if (request->leadercommit() > (int64_t) commitIndex)
                 commitIndex = std::min((uint64_t) request->leadercommit(), id);
             reply->set_ans(true);
         } catch (...) {
@@ -176,7 +176,7 @@ namespace raft {
             if (currentTerm < request->term()) currentTerm = request->term();
 
             if (request->lastlogterm() < get_lastlogterm()
-                || ((request->lastlogterm() == get_lastlogterm()) && (request->lastlogindex() < get_lastlogindex()))) {
+                || ((request->lastlogterm() == get_lastlogterm()) && (request->lastlogindex() < (int64_t) get_lastlogindex()))) {
                 reply->set_ans(false);
                 return;
             }

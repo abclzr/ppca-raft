@@ -15,7 +15,7 @@ message Entry
     string args = 3;
 }
 
-message AppendEntriesMessage
+message RequestAppendEntries
 {
     uint64 term = 1;
     string leaderID = 2;
@@ -25,7 +25,14 @@ message AppendEntriesMessage
     int64 leaderCommit = 6;
 }
 
-message RequestVoteMessage
+message ReplyAppendEntries
+{
+    uint64 term = 1;
+    bool ans = 2;
+    string followerID;
+}
+
+message RequestVote
 {
     uint64 term = 1;
     string candidateID = 2;
@@ -33,8 +40,15 @@ message RequestVoteMessage
     uint64 lastLogTerm = 4;
 }
 
+message ReplyVote
+{
+    uint64 term = 1;
+    bool ans = 2;
+    string followerID;
+}
+
 service RaftRpc
 {
-    rpc AppendEntries (AppendEntriesMessage) returns (Reply) {}
-    rpc RequestVote (RequestVoteMessage) returns (Reply) {}
+    rpc AppendEntries (AppendEntriesMessage) returns (ReplyAppendEntries) {}
+    rpc RequestVote (RequestVoteMessage) returns (ReplyVote) {}
 }

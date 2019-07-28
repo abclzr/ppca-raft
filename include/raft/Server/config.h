@@ -5,6 +5,8 @@
 #ifndef RAFT_CONFIG_H
 #define RAFT_CONFIG_H
 
+#include <cstdint>
+
 namespace raft {
 
     enum State {Leader, Candidate, Follower};

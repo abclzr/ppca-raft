@@ -7,8 +7,8 @@
 int main() {
     std::cout << "Hello, world!" << std::endl;
     raft::Client client(std::string(CMAKE_SOURCE_DIR) + "RaftConfig0.json");
-    raft::Server server1(std::string(CMAKE_SOURCE_DIR) + "RaftConfig1.json");
-    raft::Server server2(std::string(CMAKE_SOURCE_DIR) + "RaftConfig2.json");
+    raft::Server server1(std::string(CMAKE_SOURCE_DIR) + "RaftConfig1.json", 2);
+    raft::Server server2(std::string(CMAKE_SOURCE_DIR) + "RaftConfig2.json", 2);
     boost::thread t1(&raft::Server::Run, &server1);
     boost::thread t2(&raft::Server::Run, &server2);
 
