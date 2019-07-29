@@ -7,10 +7,11 @@
 namespace raft {
     struct Server::Impl {
         std::vector<std::unique_ptr<rpc::RaftRpc::Stub>> stubs;
+        std::vector<std::unique_ptr<rpc::External::Stub>> Exstubs;
         std::atomic<std::size_t> cur{0};
     };
 
-    Server::Server(const std::string &filename, uint64_t _clustnum) : clustsize(_clustnum) {
+    Server::Server(const std::string &filename, uint64_t _clustnum, const std::string &Clientaddr) : clustsize(_clustnum) {
         namespace pt = boost::property_tree;
         pt::ptree tree;
         pt::read_json(filename, tree);
@@ -25,6 +26,10 @@ namespace raft {
             pImpl->stubs.emplace_back(rpc::RaftRpc::NewStub(grpc::CreateChannel(
                     srv, grpc::InsecureChannelCredentials())));
         }
+
+        pImpl->Exstubs.emplace_back(rpc::External::NewStub((grpc::CreateChannel(
+                    Clientaddr, grpc::InsecureChannelCredentials()))));
+
 
         log.emplace_back(0, 0, "", "");
 

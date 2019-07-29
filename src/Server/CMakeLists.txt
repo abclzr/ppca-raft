@@ -5,6 +5,7 @@ set(SERVER_SRC
         Server.cpp
         RaftRpcService.cpp
         HeartBeatController.cpp
+        event.cpp
   )
 
 add_library(${PROJECT_NAME}-server ${SERVER_SRC})

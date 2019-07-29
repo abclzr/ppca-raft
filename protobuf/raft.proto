@@ -4,8 +4,6 @@ package raft.rpc;
 
 message Reply
 {
-    uint64 term = 1;
-    bool ans = 2;
 }
 
 message Entry
@@ -19,24 +17,24 @@ message RequestAppendEntries
 {
     uint64 term = 1;
     string leaderID = 2;
-    int64 prevLogIndex = 3;
+    uint64 prevLogIndex = 3;
     uint64 prevLogTerm = 4;
     repeated Entry entries = 5;
-    int64 leaderCommit = 6;
+    uint64 leaderCommit = 6;
 }
 
 message ReplyAppendEntries
 {
     uint64 term = 1;
     bool ans = 2;
-    string followerID;
+    string followerID = 3;
 }
 
 message RequestVote
 {
     uint64 term = 1;
     string candidateID = 2;
-    int64 lastLogIndex = 3;
+    uint64 lastLogIndex = 3;
     uint64 lastLogTerm = 4;
 }
 
@@ -44,11 +42,16 @@ message ReplyVote
 {
     uint64 term = 1;
     bool ans = 2;
-    string followerID;
+    string followerID = 3;
 }
 
 service RaftRpc
 {
-    rpc AppendEntries (AppendEntriesMessage) returns (ReplyAppendEntries) {}
-    rpc RequestVote (RequestVoteMessage) returns (ReplyVote) {}
+    rpc RequestAE (RequestAppendEntries) returns (Reply) {}
+    rpc RequestV (RequestVote) returns (Reply) {}
+    rpc ReplyAE (ReplyAppendEntries) returns (Reply) {}
+    rpc ReplyV (ReplyVote) returns (Reply) {}
 }
+
+
+

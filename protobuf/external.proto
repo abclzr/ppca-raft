@@ -20,8 +20,15 @@ message GetReply {
   string value = 2;
 }
 
-service External {
-  rpc Put (PutRequest) returns (PutReply) {}
+message Reply {
+}
 
-  rpc Get (GetRequest) returns (GetReply) {}
+service External {
+  rpc Put (PutRequest) returns (Reply) {}
+
+  rpc Get (GetRequest) returns (Reply) {}
+
+  rpc ReplyPut (PutRequest) returns (Reply) {}
+
+  rpc ReplyGet(GetReply) returns (Reply) {}
 }

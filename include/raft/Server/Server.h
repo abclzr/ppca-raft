@@ -6,6 +6,7 @@
 #define RAFT_SERVER_H
 
 #include <map>
+#include <queue>
 #include <string>
 #include <iostream>
 #include <boost/property_tree/json_parser.hpp>
@@ -18,6 +19,7 @@
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include "HeartBeatController.h"
+#include "event.h"
 
 namespace raft {
 
@@ -37,20 +39,18 @@ namespace raft {
         std::string get(std::string);
 
         //communicate with leader(not itself) as a follower
-        void append(const rpc::AppendEntriesMessage *, rpc::Reply *);
-        void vote(const rpc::RequestVoteMessage *, rpc::Reply *);
+        void append(const rpc::RequestAppendEntries *, rpc::Reply *);
+        void vote(const rpc::RequestVote *, rpc::Reply *);
 
         uint64_t get_lastlogindex();
         uint64_t get_lastlogterm();
 
     public:
-        Server(const std::string &filename, uint64_t);
+        Server(const std::string &, uint64_t, const std::string &);
         void RunExternal();
         void RunRaft();
-
         //start the server
         void Run();
-
         void Stop();
         ~Server();
 
@@ -60,6 +60,7 @@ namespace raft {
         std::unique_ptr<grpc::Server> serverRaft;
         boost::condition_variable cv;
         boost::mutex mu;
+        std::queue<event> q;
 
         //date members required in raft-algorithm
         bool work_is_done;
