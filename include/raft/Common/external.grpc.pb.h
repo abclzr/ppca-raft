@@ -28,109 +28,109 @@ class ServerContext;
 }  // namespace grpc
 
 namespace raft {
-namespace rpc {
+namespace external {
 
 class External final {
  public:
   static constexpr char const* service_full_name() {
-    return "raft.rpc.External";
+    return "raft.external.External";
   }
   class StubInterface {
    public:
     virtual ~StubInterface() {}
-    virtual ::grpc::Status Put(::grpc::ClientContext* context, const ::raft::rpc::PutRequest& request, ::raft::rpc::Reply* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>> AsyncPut(::grpc::ClientContext* context, const ::raft::rpc::PutRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>>(AsyncPutRaw(context, request, cq));
+    virtual ::grpc::Status Put(::grpc::ClientContext* context, const ::raft::external::PutRequest& request, ::raft::external::Reply* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>> AsyncPut(::grpc::ClientContext* context, const ::raft::external::PutRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>>(AsyncPutRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>> PrepareAsyncPut(::grpc::ClientContext* context, const ::raft::rpc::PutRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>>(PrepareAsyncPutRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>> PrepareAsyncPut(::grpc::ClientContext* context, const ::raft::external::PutRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>>(PrepareAsyncPutRaw(context, request, cq));
     }
-    virtual ::grpc::Status Get(::grpc::ClientContext* context, const ::raft::rpc::GetRequest& request, ::raft::rpc::Reply* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>> AsyncGet(::grpc::ClientContext* context, const ::raft::rpc::GetRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>>(AsyncGetRaw(context, request, cq));
+    virtual ::grpc::Status Get(::grpc::ClientContext* context, const ::raft::external::GetRequest& request, ::raft::external::Reply* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>> AsyncGet(::grpc::ClientContext* context, const ::raft::external::GetRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>>(AsyncGetRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>> PrepareAsyncGet(::grpc::ClientContext* context, const ::raft::rpc::GetRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>>(PrepareAsyncGetRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>> PrepareAsyncGet(::grpc::ClientContext* context, const ::raft::external::GetRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>>(PrepareAsyncGetRaw(context, request, cq));
     }
-    virtual ::grpc::Status ReplyPut(::grpc::ClientContext* context, const ::raft::rpc::PutReply& request, ::raft::rpc::Reply* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>> AsyncReplyPut(::grpc::ClientContext* context, const ::raft::rpc::PutReply& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>>(AsyncReplyPutRaw(context, request, cq));
+    virtual ::grpc::Status ReplyPut(::grpc::ClientContext* context, const ::raft::external::PutReply& request, ::raft::external::Reply* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>> AsyncReplyPut(::grpc::ClientContext* context, const ::raft::external::PutReply& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>>(AsyncReplyPutRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>> PrepareAsyncReplyPut(::grpc::ClientContext* context, const ::raft::rpc::PutReply& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>>(PrepareAsyncReplyPutRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>> PrepareAsyncReplyPut(::grpc::ClientContext* context, const ::raft::external::PutReply& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>>(PrepareAsyncReplyPutRaw(context, request, cq));
     }
-    virtual ::grpc::Status ReplyGet(::grpc::ClientContext* context, const ::raft::rpc::GetReply& request, ::raft::rpc::Reply* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>> AsyncReplyGet(::grpc::ClientContext* context, const ::raft::rpc::GetReply& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>>(AsyncReplyGetRaw(context, request, cq));
+    virtual ::grpc::Status ReplyGet(::grpc::ClientContext* context, const ::raft::external::GetReply& request, ::raft::external::Reply* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>> AsyncReplyGet(::grpc::ClientContext* context, const ::raft::external::GetReply& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>>(AsyncReplyGetRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>> PrepareAsyncReplyGet(::grpc::ClientContext* context, const ::raft::rpc::GetReply& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>>(PrepareAsyncReplyGetRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>> PrepareAsyncReplyGet(::grpc::ClientContext* context, const ::raft::external::GetReply& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>>(PrepareAsyncReplyGetRaw(context, request, cq));
     }
     class experimental_async_interface {
      public:
       virtual ~experimental_async_interface() {}
-      virtual void Put(::grpc::ClientContext* context, const ::raft::rpc::PutRequest* request, ::raft::rpc::Reply* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void Put(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::raft::rpc::Reply* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void Get(::grpc::ClientContext* context, const ::raft::rpc::GetRequest* request, ::raft::rpc::Reply* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void Get(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::raft::rpc::Reply* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void ReplyPut(::grpc::ClientContext* context, const ::raft::rpc::PutReply* request, ::raft::rpc::Reply* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void ReplyPut(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::raft::rpc::Reply* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void ReplyGet(::grpc::ClientContext* context, const ::raft::rpc::GetReply* request, ::raft::rpc::Reply* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void ReplyGet(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::raft::rpc::Reply* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void Put(::grpc::ClientContext* context, const ::raft::external::PutRequest* request, ::raft::external::Reply* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void Put(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::raft::external::Reply* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void Get(::grpc::ClientContext* context, const ::raft::external::GetRequest* request, ::raft::external::Reply* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void Get(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::raft::external::Reply* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ReplyPut(::grpc::ClientContext* context, const ::raft::external::PutReply* request, ::raft::external::Reply* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ReplyPut(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::raft::external::Reply* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ReplyGet(::grpc::ClientContext* context, const ::raft::external::GetReply* request, ::raft::external::Reply* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ReplyGet(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::raft::external::Reply* response, std::function<void(::grpc::Status)>) = 0;
     };
     virtual class experimental_async_interface* experimental_async() { return nullptr; }
   private:
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>* AsyncPutRaw(::grpc::ClientContext* context, const ::raft::rpc::PutRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>* PrepareAsyncPutRaw(::grpc::ClientContext* context, const ::raft::rpc::PutRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>* AsyncGetRaw(::grpc::ClientContext* context, const ::raft::rpc::GetRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>* PrepareAsyncGetRaw(::grpc::ClientContext* context, const ::raft::rpc::GetRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>* AsyncReplyPutRaw(::grpc::ClientContext* context, const ::raft::rpc::PutReply& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>* PrepareAsyncReplyPutRaw(::grpc::ClientContext* context, const ::raft::rpc::PutReply& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>* AsyncReplyGetRaw(::grpc::ClientContext* context, const ::raft::rpc::GetReply& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::raft::rpc::Reply>* PrepareAsyncReplyGetRaw(::grpc::ClientContext* context, const ::raft::rpc::GetReply& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>* AsyncPutRaw(::grpc::ClientContext* context, const ::raft::external::PutRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>* PrepareAsyncPutRaw(::grpc::ClientContext* context, const ::raft::external::PutRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>* AsyncGetRaw(::grpc::ClientContext* context, const ::raft::external::GetRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>* PrepareAsyncGetRaw(::grpc::ClientContext* context, const ::raft::external::GetRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>* AsyncReplyPutRaw(::grpc::ClientContext* context, const ::raft::external::PutReply& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>* PrepareAsyncReplyPutRaw(::grpc::ClientContext* context, const ::raft::external::PutReply& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>* AsyncReplyGetRaw(::grpc::ClientContext* context, const ::raft::external::GetReply& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::raft::external::Reply>* PrepareAsyncReplyGetRaw(::grpc::ClientContext* context, const ::raft::external::GetReply& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
     Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel);
-    ::grpc::Status Put(::grpc::ClientContext* context, const ::raft::rpc::PutRequest& request, ::raft::rpc::Reply* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>> AsyncPut(::grpc::ClientContext* context, const ::raft::rpc::PutRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>>(AsyncPutRaw(context, request, cq));
+    ::grpc::Status Put(::grpc::ClientContext* context, const ::raft::external::PutRequest& request, ::raft::external::Reply* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>> AsyncPut(::grpc::ClientContext* context, const ::raft::external::PutRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>>(AsyncPutRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>> PrepareAsyncPut(::grpc::ClientContext* context, const ::raft::rpc::PutRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>>(PrepareAsyncPutRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>> PrepareAsyncPut(::grpc::ClientContext* context, const ::raft::external::PutRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>>(PrepareAsyncPutRaw(context, request, cq));
     }
-    ::grpc::Status Get(::grpc::ClientContext* context, const ::raft::rpc::GetRequest& request, ::raft::rpc::Reply* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>> AsyncGet(::grpc::ClientContext* context, const ::raft::rpc::GetRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>>(AsyncGetRaw(context, request, cq));
+    ::grpc::Status Get(::grpc::ClientContext* context, const ::raft::external::GetRequest& request, ::raft::external::Reply* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>> AsyncGet(::grpc::ClientContext* context, const ::raft::external::GetRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>>(AsyncGetRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>> PrepareAsyncGet(::grpc::ClientContext* context, const ::raft::rpc::GetRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>>(PrepareAsyncGetRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>> PrepareAsyncGet(::grpc::ClientContext* context, const ::raft::external::GetRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>>(PrepareAsyncGetRaw(context, request, cq));
     }
-    ::grpc::Status ReplyPut(::grpc::ClientContext* context, const ::raft::rpc::PutReply& request, ::raft::rpc::Reply* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>> AsyncReplyPut(::grpc::ClientContext* context, const ::raft::rpc::PutReply& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>>(AsyncReplyPutRaw(context, request, cq));
+    ::grpc::Status ReplyPut(::grpc::ClientContext* context, const ::raft::external::PutReply& request, ::raft::external::Reply* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>> AsyncReplyPut(::grpc::ClientContext* context, const ::raft::external::PutReply& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>>(AsyncReplyPutRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>> PrepareAsyncReplyPut(::grpc::ClientContext* context, const ::raft::rpc::PutReply& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>>(PrepareAsyncReplyPutRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>> PrepareAsyncReplyPut(::grpc::ClientContext* context, const ::raft::external::PutReply& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>>(PrepareAsyncReplyPutRaw(context, request, cq));
     }
-    ::grpc::Status ReplyGet(::grpc::ClientContext* context, const ::raft::rpc::GetReply& request, ::raft::rpc::Reply* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>> AsyncReplyGet(::grpc::ClientContext* context, const ::raft::rpc::GetReply& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>>(AsyncReplyGetRaw(context, request, cq));
+    ::grpc::Status ReplyGet(::grpc::ClientContext* context, const ::raft::external::GetReply& request, ::raft::external::Reply* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>> AsyncReplyGet(::grpc::ClientContext* context, const ::raft::external::GetReply& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>>(AsyncReplyGetRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>> PrepareAsyncReplyGet(::grpc::ClientContext* context, const ::raft::rpc::GetReply& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>>(PrepareAsyncReplyGetRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>> PrepareAsyncReplyGet(::grpc::ClientContext* context, const ::raft::external::GetReply& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>>(PrepareAsyncReplyGetRaw(context, request, cq));
     }
     class experimental_async final :
       public StubInterface::experimental_async_interface {
      public:
-      void Put(::grpc::ClientContext* context, const ::raft::rpc::PutRequest* request, ::raft::rpc::Reply* response, std::function<void(::grpc::Status)>) override;
-      void Put(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::raft::rpc::Reply* response, std::function<void(::grpc::Status)>) override;
-      void Get(::grpc::ClientContext* context, const ::raft::rpc::GetRequest* request, ::raft::rpc::Reply* response, std::function<void(::grpc::Status)>) override;
-      void Get(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::raft::rpc::Reply* response, std::function<void(::grpc::Status)>) override;
-      void ReplyPut(::grpc::ClientContext* context, const ::raft::rpc::PutReply* request, ::raft::rpc::Reply* response, std::function<void(::grpc::Status)>) override;
-      void ReplyPut(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::raft::rpc::Reply* response, std::function<void(::grpc::Status)>) override;
-      void ReplyGet(::grpc::ClientContext* context, const ::raft::rpc::GetReply* request, ::raft::rpc::Reply* response, std::function<void(::grpc::Status)>) override;
-      void ReplyGet(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::raft::rpc::Reply* response, std::function<void(::grpc::Status)>) override;
+      void Put(::grpc::ClientContext* context, const ::raft::external::PutRequest* request, ::raft::external::Reply* response, std::function<void(::grpc::Status)>) override;
+      void Put(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::raft::external::Reply* response, std::function<void(::grpc::Status)>) override;
+      void Get(::grpc::ClientContext* context, const ::raft::external::GetRequest* request, ::raft::external::Reply* response, std::function<void(::grpc::Status)>) override;
+      void Get(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::raft::external::Reply* response, std::function<void(::grpc::Status)>) override;
+      void ReplyPut(::grpc::ClientContext* context, const ::raft::external::PutReply* request, ::raft::external::Reply* response, std::function<void(::grpc::Status)>) override;
+      void ReplyPut(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::raft::external::Reply* response, std::function<void(::grpc::Status)>) override;
+      void ReplyGet(::grpc::ClientContext* context, const ::raft::external::GetReply* request, ::raft::external::Reply* response, std::function<void(::grpc::Status)>) override;
+      void ReplyGet(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::raft::external::Reply* response, std::function<void(::grpc::Status)>) override;
      private:
       friend class Stub;
       explicit experimental_async(Stub* stub): stub_(stub) { }
@@ -142,14 +142,14 @@ class External final {
    private:
     std::shared_ptr< ::grpc::ChannelInterface> channel_;
     class experimental_async async_stub_{this};
-    ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>* AsyncPutRaw(::grpc::ClientContext* context, const ::raft::rpc::PutRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>* PrepareAsyncPutRaw(::grpc::ClientContext* context, const ::raft::rpc::PutRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>* AsyncGetRaw(::grpc::ClientContext* context, const ::raft::rpc::GetRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>* PrepareAsyncGetRaw(::grpc::ClientContext* context, const ::raft::rpc::GetRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>* AsyncReplyPutRaw(::grpc::ClientContext* context, const ::raft::rpc::PutReply& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>* PrepareAsyncReplyPutRaw(::grpc::ClientContext* context, const ::raft::rpc::PutReply& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>* AsyncReplyGetRaw(::grpc::ClientContext* context, const ::raft::rpc::GetReply& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::raft::rpc::Reply>* PrepareAsyncReplyGetRaw(::grpc::ClientContext* context, const ::raft::rpc::GetReply& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>* AsyncPutRaw(::grpc::ClientContext* context, const ::raft::external::PutRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>* PrepareAsyncPutRaw(::grpc::ClientContext* context, const ::raft::external::PutRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>* AsyncGetRaw(::grpc::ClientContext* context, const ::raft::external::GetRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>* PrepareAsyncGetRaw(::grpc::ClientContext* context, const ::raft::external::GetRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>* AsyncReplyPutRaw(::grpc::ClientContext* context, const ::raft::external::PutReply& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>* PrepareAsyncReplyPutRaw(::grpc::ClientContext* context, const ::raft::external::PutReply& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>* AsyncReplyGetRaw(::grpc::ClientContext* context, const ::raft::external::GetReply& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::raft::external::Reply>* PrepareAsyncReplyGetRaw(::grpc::ClientContext* context, const ::raft::external::GetReply& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_Put_;
     const ::grpc::internal::RpcMethod rpcmethod_Get_;
     const ::grpc::internal::RpcMethod rpcmethod_ReplyPut_;
@@ -161,10 +161,10 @@ class External final {
    public:
     Service();
     virtual ~Service();
-    virtual ::grpc::Status Put(::grpc::ServerContext* context, const ::raft::rpc::PutRequest* request, ::raft::rpc::Reply* response);
-    virtual ::grpc::Status Get(::grpc::ServerContext* context, const ::raft::rpc::GetRequest* request, ::raft::rpc::Reply* response);
-    virtual ::grpc::Status ReplyPut(::grpc::ServerContext* context, const ::raft::rpc::PutReply* request, ::raft::rpc::Reply* response);
-    virtual ::grpc::Status ReplyGet(::grpc::ServerContext* context, const ::raft::rpc::GetReply* request, ::raft::rpc::Reply* response);
+    virtual ::grpc::Status Put(::grpc::ServerContext* context, const ::raft::external::PutRequest* request, ::raft::external::Reply* response);
+    virtual ::grpc::Status Get(::grpc::ServerContext* context, const ::raft::external::GetRequest* request, ::raft::external::Reply* response);
+    virtual ::grpc::Status ReplyPut(::grpc::ServerContext* context, const ::raft::external::PutReply* request, ::raft::external::Reply* response);
+    virtual ::grpc::Status ReplyGet(::grpc::ServerContext* context, const ::raft::external::GetReply* request, ::raft::external::Reply* response);
   };
   template <class BaseClass>
   class WithAsyncMethod_Put : public BaseClass {
@@ -178,11 +178,11 @@ class External final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Put(::grpc::ServerContext* context, const ::raft::rpc::PutRequest* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status Put(::grpc::ServerContext* context, const ::raft::external::PutRequest* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestPut(::grpc::ServerContext* context, ::raft::rpc::PutRequest* request, ::grpc::ServerAsyncResponseWriter< ::raft::rpc::Reply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestPut(::grpc::ServerContext* context, ::raft::external::PutRequest* request, ::grpc::ServerAsyncResponseWriter< ::raft::external::Reply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
@@ -198,11 +198,11 @@ class External final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Get(::grpc::ServerContext* context, const ::raft::rpc::GetRequest* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status Get(::grpc::ServerContext* context, const ::raft::external::GetRequest* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestGet(::grpc::ServerContext* context, ::raft::rpc::GetRequest* request, ::grpc::ServerAsyncResponseWriter< ::raft::rpc::Reply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestGet(::grpc::ServerContext* context, ::raft::external::GetRequest* request, ::grpc::ServerAsyncResponseWriter< ::raft::external::Reply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
@@ -218,11 +218,11 @@ class External final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReplyPut(::grpc::ServerContext* context, const ::raft::rpc::PutReply* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status ReplyPut(::grpc::ServerContext* context, const ::raft::external::PutReply* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestReplyPut(::grpc::ServerContext* context, ::raft::rpc::PutReply* request, ::grpc::ServerAsyncResponseWriter< ::raft::rpc::Reply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestReplyPut(::grpc::ServerContext* context, ::raft::external::PutReply* request, ::grpc::ServerAsyncResponseWriter< ::raft::external::Reply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
@@ -238,11 +238,11 @@ class External final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReplyGet(::grpc::ServerContext* context, const ::raft::rpc::GetReply* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status ReplyGet(::grpc::ServerContext* context, const ::raft::external::GetReply* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestReplyGet(::grpc::ServerContext* context, ::raft::rpc::GetReply* request, ::grpc::ServerAsyncResponseWriter< ::raft::rpc::Reply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestReplyGet(::grpc::ServerContext* context, ::raft::external::GetReply* request, ::grpc::ServerAsyncResponseWriter< ::raft::external::Reply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
@@ -254,10 +254,10 @@ class External final {
    public:
     ExperimentalWithCallbackMethod_Put() {
       ::grpc::Service::experimental().MarkMethodCallback(0,
-        new ::grpc::internal::CallbackUnaryHandler< ::raft::rpc::PutRequest, ::raft::rpc::Reply>(
+        new ::grpc::internal::CallbackUnaryHandler< ::raft::external::PutRequest, ::raft::external::Reply>(
           [this](::grpc::ServerContext* context,
-                 const ::raft::rpc::PutRequest* request,
-                 ::raft::rpc::Reply* response,
+                 const ::raft::external::PutRequest* request,
+                 ::raft::external::Reply* response,
                  ::grpc::experimental::ServerCallbackRpcController* controller) {
                    return this->Put(context, request, response, controller);
                  }));
@@ -266,11 +266,11 @@ class External final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Put(::grpc::ServerContext* context, const ::raft::rpc::PutRequest* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status Put(::grpc::ServerContext* context, const ::raft::external::PutRequest* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual void Put(::grpc::ServerContext* context, const ::raft::rpc::PutRequest* request, ::raft::rpc::Reply* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+    virtual void Put(::grpc::ServerContext* context, const ::raft::external::PutRequest* request, ::raft::external::Reply* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
   class ExperimentalWithCallbackMethod_Get : public BaseClass {
@@ -279,10 +279,10 @@ class External final {
    public:
     ExperimentalWithCallbackMethod_Get() {
       ::grpc::Service::experimental().MarkMethodCallback(1,
-        new ::grpc::internal::CallbackUnaryHandler< ::raft::rpc::GetRequest, ::raft::rpc::Reply>(
+        new ::grpc::internal::CallbackUnaryHandler< ::raft::external::GetRequest, ::raft::external::Reply>(
           [this](::grpc::ServerContext* context,
-                 const ::raft::rpc::GetRequest* request,
-                 ::raft::rpc::Reply* response,
+                 const ::raft::external::GetRequest* request,
+                 ::raft::external::Reply* response,
                  ::grpc::experimental::ServerCallbackRpcController* controller) {
                    return this->Get(context, request, response, controller);
                  }));
@@ -291,11 +291,11 @@ class External final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Get(::grpc::ServerContext* context, const ::raft::rpc::GetRequest* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status Get(::grpc::ServerContext* context, const ::raft::external::GetRequest* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual void Get(::grpc::ServerContext* context, const ::raft::rpc::GetRequest* request, ::raft::rpc::Reply* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+    virtual void Get(::grpc::ServerContext* context, const ::raft::external::GetRequest* request, ::raft::external::Reply* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
   class ExperimentalWithCallbackMethod_ReplyPut : public BaseClass {
@@ -304,10 +304,10 @@ class External final {
    public:
     ExperimentalWithCallbackMethod_ReplyPut() {
       ::grpc::Service::experimental().MarkMethodCallback(2,
-        new ::grpc::internal::CallbackUnaryHandler< ::raft::rpc::PutReply, ::raft::rpc::Reply>(
+        new ::grpc::internal::CallbackUnaryHandler< ::raft::external::PutReply, ::raft::external::Reply>(
           [this](::grpc::ServerContext* context,
-                 const ::raft::rpc::PutReply* request,
-                 ::raft::rpc::Reply* response,
+                 const ::raft::external::PutReply* request,
+                 ::raft::external::Reply* response,
                  ::grpc::experimental::ServerCallbackRpcController* controller) {
                    return this->ReplyPut(context, request, response, controller);
                  }));
@@ -316,11 +316,11 @@ class External final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReplyPut(::grpc::ServerContext* context, const ::raft::rpc::PutReply* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status ReplyPut(::grpc::ServerContext* context, const ::raft::external::PutReply* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual void ReplyPut(::grpc::ServerContext* context, const ::raft::rpc::PutReply* request, ::raft::rpc::Reply* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+    virtual void ReplyPut(::grpc::ServerContext* context, const ::raft::external::PutReply* request, ::raft::external::Reply* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
   class ExperimentalWithCallbackMethod_ReplyGet : public BaseClass {
@@ -329,10 +329,10 @@ class External final {
    public:
     ExperimentalWithCallbackMethod_ReplyGet() {
       ::grpc::Service::experimental().MarkMethodCallback(3,
-        new ::grpc::internal::CallbackUnaryHandler< ::raft::rpc::GetReply, ::raft::rpc::Reply>(
+        new ::grpc::internal::CallbackUnaryHandler< ::raft::external::GetReply, ::raft::external::Reply>(
           [this](::grpc::ServerContext* context,
-                 const ::raft::rpc::GetReply* request,
-                 ::raft::rpc::Reply* response,
+                 const ::raft::external::GetReply* request,
+                 ::raft::external::Reply* response,
                  ::grpc::experimental::ServerCallbackRpcController* controller) {
                    return this->ReplyGet(context, request, response, controller);
                  }));
@@ -341,11 +341,11 @@ class External final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReplyGet(::grpc::ServerContext* context, const ::raft::rpc::GetReply* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status ReplyGet(::grpc::ServerContext* context, const ::raft::external::GetReply* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual void ReplyGet(::grpc::ServerContext* context, const ::raft::rpc::GetReply* request, ::raft::rpc::Reply* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+    virtual void ReplyGet(::grpc::ServerContext* context, const ::raft::external::GetReply* request, ::raft::external::Reply* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   typedef ExperimentalWithCallbackMethod_Put<ExperimentalWithCallbackMethod_Get<ExperimentalWithCallbackMethod_ReplyPut<ExperimentalWithCallbackMethod_ReplyGet<Service > > > > ExperimentalCallbackService;
   template <class BaseClass>
@@ -360,7 +360,7 @@ class External final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Put(::grpc::ServerContext* context, const ::raft::rpc::PutRequest* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status Put(::grpc::ServerContext* context, const ::raft::external::PutRequest* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -377,7 +377,7 @@ class External final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Get(::grpc::ServerContext* context, const ::raft::rpc::GetRequest* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status Get(::grpc::ServerContext* context, const ::raft::external::GetRequest* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -394,7 +394,7 @@ class External final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReplyPut(::grpc::ServerContext* context, const ::raft::rpc::PutReply* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status ReplyPut(::grpc::ServerContext* context, const ::raft::external::PutReply* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -411,7 +411,7 @@ class External final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReplyGet(::grpc::ServerContext* context, const ::raft::rpc::GetReply* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status ReplyGet(::grpc::ServerContext* context, const ::raft::external::GetReply* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -428,7 +428,7 @@ class External final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Put(::grpc::ServerContext* context, const ::raft::rpc::PutRequest* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status Put(::grpc::ServerContext* context, const ::raft::external::PutRequest* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -448,7 +448,7 @@ class External final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Get(::grpc::ServerContext* context, const ::raft::rpc::GetRequest* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status Get(::grpc::ServerContext* context, const ::raft::external::GetRequest* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -468,7 +468,7 @@ class External final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReplyPut(::grpc::ServerContext* context, const ::raft::rpc::PutReply* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status ReplyPut(::grpc::ServerContext* context, const ::raft::external::PutReply* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -488,7 +488,7 @@ class External final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReplyGet(::grpc::ServerContext* context, const ::raft::rpc::GetReply* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status ReplyGet(::grpc::ServerContext* context, const ::raft::external::GetReply* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -515,7 +515,7 @@ class External final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Put(::grpc::ServerContext* context, const ::raft::rpc::PutRequest* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status Put(::grpc::ServerContext* context, const ::raft::external::PutRequest* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -540,7 +540,7 @@ class External final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Get(::grpc::ServerContext* context, const ::raft::rpc::GetRequest* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status Get(::grpc::ServerContext* context, const ::raft::external::GetRequest* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -565,7 +565,7 @@ class External final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReplyPut(::grpc::ServerContext* context, const ::raft::rpc::PutReply* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status ReplyPut(::grpc::ServerContext* context, const ::raft::external::PutReply* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -590,7 +590,7 @@ class External final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReplyGet(::grpc::ServerContext* context, const ::raft::rpc::GetReply* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status ReplyGet(::grpc::ServerContext* context, const ::raft::external::GetReply* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -603,18 +603,18 @@ class External final {
    public:
     WithStreamedUnaryMethod_Put() {
       ::grpc::Service::MarkMethodStreamed(0,
-        new ::grpc::internal::StreamedUnaryHandler< ::raft::rpc::PutRequest, ::raft::rpc::Reply>(std::bind(&WithStreamedUnaryMethod_Put<BaseClass>::StreamedPut, this, std::placeholders::_1, std::placeholders::_2)));
+        new ::grpc::internal::StreamedUnaryHandler< ::raft::external::PutRequest, ::raft::external::Reply>(std::bind(&WithStreamedUnaryMethod_Put<BaseClass>::StreamedPut, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_Put() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status Put(::grpc::ServerContext* context, const ::raft::rpc::PutRequest* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status Put(::grpc::ServerContext* context, const ::raft::external::PutRequest* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedPut(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::raft::rpc::PutRequest,::raft::rpc::Reply>* server_unary_streamer) = 0;
+    virtual ::grpc::Status StreamedPut(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::raft::external::PutRequest,::raft::external::Reply>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
   class WithStreamedUnaryMethod_Get : public BaseClass {
@@ -623,18 +623,18 @@ class External final {
    public:
     WithStreamedUnaryMethod_Get() {
       ::grpc::Service::MarkMethodStreamed(1,
-        new ::grpc::internal::StreamedUnaryHandler< ::raft::rpc::GetRequest, ::raft::rpc::Reply>(std::bind(&WithStreamedUnaryMethod_Get<BaseClass>::StreamedGet, this, std::placeholders::_1, std::placeholders::_2)));
+        new ::grpc::internal::StreamedUnaryHandler< ::raft::external::GetRequest, ::raft::external::Reply>(std::bind(&WithStreamedUnaryMethod_Get<BaseClass>::StreamedGet, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_Get() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status Get(::grpc::ServerContext* context, const ::raft::rpc::GetRequest* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status Get(::grpc::ServerContext* context, const ::raft::external::GetRequest* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedGet(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::raft::rpc::GetRequest,::raft::rpc::Reply>* server_unary_streamer) = 0;
+    virtual ::grpc::Status StreamedGet(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::raft::external::GetRequest,::raft::external::Reply>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
   class WithStreamedUnaryMethod_ReplyPut : public BaseClass {
@@ -643,18 +643,18 @@ class External final {
    public:
     WithStreamedUnaryMethod_ReplyPut() {
       ::grpc::Service::MarkMethodStreamed(2,
-        new ::grpc::internal::StreamedUnaryHandler< ::raft::rpc::PutReply, ::raft::rpc::Reply>(std::bind(&WithStreamedUnaryMethod_ReplyPut<BaseClass>::StreamedReplyPut, this, std::placeholders::_1, std::placeholders::_2)));
+        new ::grpc::internal::StreamedUnaryHandler< ::raft::external::PutReply, ::raft::external::Reply>(std::bind(&WithStreamedUnaryMethod_ReplyPut<BaseClass>::StreamedReplyPut, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_ReplyPut() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status ReplyPut(::grpc::ServerContext* context, const ::raft::rpc::PutReply* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status ReplyPut(::grpc::ServerContext* context, const ::raft::external::PutReply* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedReplyPut(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::raft::rpc::PutReply,::raft::rpc::Reply>* server_unary_streamer) = 0;
+    virtual ::grpc::Status StreamedReplyPut(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::raft::external::PutReply,::raft::external::Reply>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
   class WithStreamedUnaryMethod_ReplyGet : public BaseClass {
@@ -663,25 +663,25 @@ class External final {
    public:
     WithStreamedUnaryMethod_ReplyGet() {
       ::grpc::Service::MarkMethodStreamed(3,
-        new ::grpc::internal::StreamedUnaryHandler< ::raft::rpc::GetReply, ::raft::rpc::Reply>(std::bind(&WithStreamedUnaryMethod_ReplyGet<BaseClass>::StreamedReplyGet, this, std::placeholders::_1, std::placeholders::_2)));
+        new ::grpc::internal::StreamedUnaryHandler< ::raft::external::GetReply, ::raft::external::Reply>(std::bind(&WithStreamedUnaryMethod_ReplyGet<BaseClass>::StreamedReplyGet, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_ReplyGet() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status ReplyGet(::grpc::ServerContext* context, const ::raft::rpc::GetReply* request, ::raft::rpc::Reply* response) override {
+    ::grpc::Status ReplyGet(::grpc::ServerContext* context, const ::raft::external::GetReply* request, ::raft::external::Reply* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedReplyGet(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::raft::rpc::GetReply,::raft::rpc::Reply>* server_unary_streamer) = 0;
+    virtual ::grpc::Status StreamedReplyGet(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::raft::external::GetReply,::raft::external::Reply>* server_unary_streamer) = 0;
   };
   typedef WithStreamedUnaryMethod_Put<WithStreamedUnaryMethod_Get<WithStreamedUnaryMethod_ReplyPut<WithStreamedUnaryMethod_ReplyGet<Service > > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
   typedef WithStreamedUnaryMethod_Put<WithStreamedUnaryMethod_Get<WithStreamedUnaryMethod_ReplyPut<WithStreamedUnaryMethod_ReplyGet<Service > > > > StreamedService;
 };
 
-}  // namespace rpc
+}  // namespace external
 }  // namespace raft
 
 

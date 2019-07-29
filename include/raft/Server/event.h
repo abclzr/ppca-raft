@@ -14,7 +14,7 @@
 
 namespace raft {
 
-    enum EventType{Election, ElectionDone, RequestAppendEntries, RequestVote,
+    enum EventType{Election, ElectionDone, HeartBeat, RequestAppendEntries, RequestVote,
             Put, Get, ReplyAppendEntries, ReplyVote};
 
     class event {
@@ -34,7 +34,7 @@ namespace raft {
             uint64_t prevLogTerm;
             std::vector<Entry>entries;
             uint64_t leaderCommit;
-            explicit RequestAppendEntries(rpc::RequestAppendEntries *);
+            explicit RequestAppendEntries(const rpc::RequestAppendEntries *);
         } *RequestAE;
 
         struct RequestVote {
@@ -42,41 +42,41 @@ namespace raft {
             std::string candidateID = 2;
             int64_t lastLogIndex = 3;
             uint64_t lastLogTerm = 4;
-            explicit RequestVote(rpc::RequestVote *);
+            explicit RequestVote(const rpc::RequestVote *);
         } *RequestV;
 
         struct Put {
             std::string key;
             std::string value;
-            explicit Put(rpc::PutRequest *);
+            explicit Put(const external::PutRequest *);
         } *put;
 
         struct Get {
             std::string key;
-            explicit Get(rpc::GetRequest *);
+            explicit Get(const external::GetRequest *);
         } *get;
 
         struct ReplyAppendEntries {
             uint64_t term;
             bool ans;
             std::string followerID;
-            explicit ReplyAppendEntries(rpc::ReplyAppendEntries *);
+            explicit ReplyAppendEntries(const rpc::ReplyAppendEntries *);
         } *ReplyAE;
 
         struct ReplyVote {
             uint64_t term;
             bool ans;
             std::string followerID;
-            explicit ReplyVote(rpc::ReplyVote *);
+            explicit ReplyVote(const rpc::ReplyVote *);
         } *ReplyV;
 
         explicit event(EventType);
-        explicit event(rpc::RequestAppendEntries *);
-        explicit event(rpc::RequestVote *);
-        explicit event(rpc::PutRequest *);
-        explicit event(rpc::GetRequest *);
-        explicit event(rpc::ReplyAppendEntries *);
-        explicit event(rpc::ReplyVote *);
+        explicit event(const rpc::RequestAppendEntries *);
+        explicit event(const rpc::RequestVote *);
+        explicit event(const external::PutRequest *);
+        explicit event(const external::GetRequest *);
+        explicit event(const rpc::ReplyAppendEntries *);
+        explicit event(const rpc::ReplyVote *);
 
     };
 

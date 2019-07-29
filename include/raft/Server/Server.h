@@ -26,13 +26,19 @@ namespace raft {
     class Server {
     private:
         std::map<std::string, std::string> table;
+        std::map<std::string, uint32_t> getServer;
+        State getState();
+        uint64_t get_lastlogindex();
+        uint64_t get_lastlogterm();
+        uint64_t getTerm(uint64_t index);
+
         struct Impl;
         std::unique_ptr<Impl> pImpl;
         std::string local_address;
 
         //communicate with client as a leader
-        void put(std::string, std::string);
-        void get(std::string);
+        void put(const external::PutRequest *request, external::Reply *response);
+        void get(const external::GetRequest *request, external::Reply *response);
 
         //communicate between servers
         void requestAE(const rpc::RequestAppendEntries *request, rpc::Reply *reply);
@@ -40,13 +46,20 @@ namespace raft {
         void replyAE(const rpc::ReplyAppendEntries *request, rpc::Reply *reply);
         void replyV(const rpc::ReplyVote *request, rpc::Reply *reply);
 
-        uint64_t get_lastlogindex();
-        uint64_t get_lastlogterm();
 
         //event_queue
         boost::condition_variable cv;
         boost::mutex mu;
         std::queue<event> q;
+        void processEvent(const event &);
+
+        //process event
+        void AppendEntries(const event::RequestAppendEntries *p);
+        void Vote(const event::RequestVote *p);
+        void replyAppendEntries(const event::ReplyAppendEntries *p);
+        void replyVote(const event::ReplyVote *p);
+        void Put(const event::Put *p);
+        void Get(const event::Get *p);
 
     public:
         Server(const std::string &, uint64_t, const std::string &);
@@ -63,12 +76,10 @@ namespace raft {
         boost::thread t3;
         std::unique_ptr<grpc::Server> serverExternal;
         std::unique_ptr<grpc::Server> serverRaft;
-        boost::condition_variable cv;
-        boost::mutex mu;
-        std::queue<event> q;
 
         //date members required in raft-algorithm
         bool work_is_done;
+        uint64_t votesnum;
         uint64_t clustsize;
         uint64_t currentTerm;
         std::string votedFor;
@@ -81,7 +92,7 @@ namespace raft {
         };
         std::vector<LogEntry> log;
         uint64_t commitIndex;
-        uint64_t lasatApplied;
+        uint64_t lastApplied;
         std::vector<uint64_t> nextIndex;
         std::vector<uint64_t> matchIndex;
 

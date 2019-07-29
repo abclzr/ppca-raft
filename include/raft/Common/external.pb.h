@@ -49,7 +49,7 @@ struct TableStruct_external_2eproto {
 };
 void AddDescriptors_external_2eproto();
 namespace raft {
-namespace rpc {
+namespace external {
 class GetReply;
 class GetReplyDefaultTypeInternal;
 extern GetReplyDefaultTypeInternal _GetReply_default_instance_;
@@ -65,24 +65,24 @@ extern PutRequestDefaultTypeInternal _PutRequest_default_instance_;
 class Reply;
 class ReplyDefaultTypeInternal;
 extern ReplyDefaultTypeInternal _Reply_default_instance_;
-}  // namespace rpc
+}  // namespace external
 }  // namespace raft
 namespace google {
 namespace protobuf {
-template<> ::raft::rpc::GetReply* Arena::CreateMaybeMessage<::raft::rpc::GetReply>(Arena*);
-template<> ::raft::rpc::GetRequest* Arena::CreateMaybeMessage<::raft::rpc::GetRequest>(Arena*);
-template<> ::raft::rpc::PutReply* Arena::CreateMaybeMessage<::raft::rpc::PutReply>(Arena*);
-template<> ::raft::rpc::PutRequest* Arena::CreateMaybeMessage<::raft::rpc::PutRequest>(Arena*);
-template<> ::raft::rpc::Reply* Arena::CreateMaybeMessage<::raft::rpc::Reply>(Arena*);
+template<> ::raft::external::GetReply* Arena::CreateMaybeMessage<::raft::external::GetReply>(Arena*);
+template<> ::raft::external::GetRequest* Arena::CreateMaybeMessage<::raft::external::GetRequest>(Arena*);
+template<> ::raft::external::PutReply* Arena::CreateMaybeMessage<::raft::external::PutReply>(Arena*);
+template<> ::raft::external::PutRequest* Arena::CreateMaybeMessage<::raft::external::PutRequest>(Arena*);
+template<> ::raft::external::Reply* Arena::CreateMaybeMessage<::raft::external::Reply>(Arena*);
 }  // namespace protobuf
 }  // namespace google
 namespace raft {
-namespace rpc {
+namespace external {
 
 // ===================================================================
 
 class PutRequest final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:raft.rpc.PutRequest) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:raft.external.PutRequest) */ {
  public:
   PutRequest();
   virtual ~PutRequest();
@@ -204,7 +204,7 @@ class PutRequest final :
   ::std::string* release_value();
   void set_allocated_value(::std::string* value);
 
-  // @@protoc_insertion_point(class_scope:raft.rpc.PutRequest)
+  // @@protoc_insertion_point(class_scope:raft.external.PutRequest)
  private:
   class HasBitSetters;
 
@@ -217,7 +217,7 @@ class PutRequest final :
 // -------------------------------------------------------------------
 
 class PutReply final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:raft.rpc.PutReply) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:raft.external.PutReply) */ {
  public:
   PutReply();
   virtual ~PutReply();
@@ -317,7 +317,7 @@ class PutReply final :
   bool status() const;
   void set_status(bool value);
 
-  // @@protoc_insertion_point(class_scope:raft.rpc.PutReply)
+  // @@protoc_insertion_point(class_scope:raft.external.PutReply)
  private:
   class HasBitSetters;
 
@@ -329,7 +329,7 @@ class PutReply final :
 // -------------------------------------------------------------------
 
 class GetRequest final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:raft.rpc.GetRequest) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:raft.external.GetRequest) */ {
  public:
   GetRequest();
   virtual ~GetRequest();
@@ -437,7 +437,7 @@ class GetRequest final :
   ::std::string* release_key();
   void set_allocated_key(::std::string* key);
 
-  // @@protoc_insertion_point(class_scope:raft.rpc.GetRequest)
+  // @@protoc_insertion_point(class_scope:raft.external.GetRequest)
  private:
   class HasBitSetters;
 
@@ -449,7 +449,7 @@ class GetRequest final :
 // -------------------------------------------------------------------
 
 class GetReply final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:raft.rpc.GetReply) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:raft.external.GetReply) */ {
  public:
   GetReply();
   virtual ~GetReply();
@@ -563,7 +563,7 @@ class GetReply final :
   bool status() const;
   void set_status(bool value);
 
-  // @@protoc_insertion_point(class_scope:raft.rpc.GetReply)
+  // @@protoc_insertion_point(class_scope:raft.external.GetReply)
  private:
   class HasBitSetters;
 
@@ -576,7 +576,7 @@ class GetReply final :
 // -------------------------------------------------------------------
 
 class Reply final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:raft.rpc.Reply) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:raft.external.Reply) */ {
  public:
   Reply();
   virtual ~Reply();
@@ -670,7 +670,7 @@ class Reply final :
 
   // accessors -------------------------------------------------------
 
-  // @@protoc_insertion_point(class_scope:raft.rpc.Reply)
+  // @@protoc_insertion_point(class_scope:raft.external.Reply)
  private:
   class HasBitSetters;
 
@@ -694,41 +694,41 @@ inline void PutRequest::clear_key() {
   key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& PutRequest::key() const {
-  // @@protoc_insertion_point(field_get:raft.rpc.PutRequest.key)
+  // @@protoc_insertion_point(field_get:raft.external.PutRequest.key)
   return key_.GetNoArena();
 }
 inline void PutRequest::set_key(const ::std::string& value) {
   
   key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:raft.rpc.PutRequest.key)
+  // @@protoc_insertion_point(field_set:raft.external.PutRequest.key)
 }
 #if LANG_CXX11
 inline void PutRequest::set_key(::std::string&& value) {
   
   key_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:raft.rpc.PutRequest.key)
+  // @@protoc_insertion_point(field_set_rvalue:raft.external.PutRequest.key)
 }
 #endif
 inline void PutRequest::set_key(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:raft.rpc.PutRequest.key)
+  // @@protoc_insertion_point(field_set_char:raft.external.PutRequest.key)
 }
 inline void PutRequest::set_key(const char* value, size_t size) {
   
   key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:raft.rpc.PutRequest.key)
+  // @@protoc_insertion_point(field_set_pointer:raft.external.PutRequest.key)
 }
 inline ::std::string* PutRequest::mutable_key() {
   
-  // @@protoc_insertion_point(field_mutable:raft.rpc.PutRequest.key)
+  // @@protoc_insertion_point(field_mutable:raft.external.PutRequest.key)
   return key_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* PutRequest::release_key() {
-  // @@protoc_insertion_point(field_release:raft.rpc.PutRequest.key)
+  // @@protoc_insertion_point(field_release:raft.external.PutRequest.key)
   
   return key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -739,7 +739,7 @@ inline void PutRequest::set_allocated_key(::std::string* key) {
     
   }
   key_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), key);
-  // @@protoc_insertion_point(field_set_allocated:raft.rpc.PutRequest.key)
+  // @@protoc_insertion_point(field_set_allocated:raft.external.PutRequest.key)
 }
 
 // string value = 2;
@@ -747,41 +747,41 @@ inline void PutRequest::clear_value() {
   value_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& PutRequest::value() const {
-  // @@protoc_insertion_point(field_get:raft.rpc.PutRequest.value)
+  // @@protoc_insertion_point(field_get:raft.external.PutRequest.value)
   return value_.GetNoArena();
 }
 inline void PutRequest::set_value(const ::std::string& value) {
   
   value_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:raft.rpc.PutRequest.value)
+  // @@protoc_insertion_point(field_set:raft.external.PutRequest.value)
 }
 #if LANG_CXX11
 inline void PutRequest::set_value(::std::string&& value) {
   
   value_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:raft.rpc.PutRequest.value)
+  // @@protoc_insertion_point(field_set_rvalue:raft.external.PutRequest.value)
 }
 #endif
 inline void PutRequest::set_value(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   value_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:raft.rpc.PutRequest.value)
+  // @@protoc_insertion_point(field_set_char:raft.external.PutRequest.value)
 }
 inline void PutRequest::set_value(const char* value, size_t size) {
   
   value_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:raft.rpc.PutRequest.value)
+  // @@protoc_insertion_point(field_set_pointer:raft.external.PutRequest.value)
 }
 inline ::std::string* PutRequest::mutable_value() {
   
-  // @@protoc_insertion_point(field_mutable:raft.rpc.PutRequest.value)
+  // @@protoc_insertion_point(field_mutable:raft.external.PutRequest.value)
   return value_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* PutRequest::release_value() {
-  // @@protoc_insertion_point(field_release:raft.rpc.PutRequest.value)
+  // @@protoc_insertion_point(field_release:raft.external.PutRequest.value)
   
   return value_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -792,7 +792,7 @@ inline void PutRequest::set_allocated_value(::std::string* value) {
     
   }
   value_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set_allocated:raft.rpc.PutRequest.value)
+  // @@protoc_insertion_point(field_set_allocated:raft.external.PutRequest.value)
 }
 
 // -------------------------------------------------------------------
@@ -804,13 +804,13 @@ inline void PutReply::clear_status() {
   status_ = false;
 }
 inline bool PutReply::status() const {
-  // @@protoc_insertion_point(field_get:raft.rpc.PutReply.status)
+  // @@protoc_insertion_point(field_get:raft.external.PutReply.status)
   return status_;
 }
 inline void PutReply::set_status(bool value) {
   
   status_ = value;
-  // @@protoc_insertion_point(field_set:raft.rpc.PutReply.status)
+  // @@protoc_insertion_point(field_set:raft.external.PutReply.status)
 }
 
 // -------------------------------------------------------------------
@@ -822,41 +822,41 @@ inline void GetRequest::clear_key() {
   key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& GetRequest::key() const {
-  // @@protoc_insertion_point(field_get:raft.rpc.GetRequest.key)
+  // @@protoc_insertion_point(field_get:raft.external.GetRequest.key)
   return key_.GetNoArena();
 }
 inline void GetRequest::set_key(const ::std::string& value) {
   
   key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:raft.rpc.GetRequest.key)
+  // @@protoc_insertion_point(field_set:raft.external.GetRequest.key)
 }
 #if LANG_CXX11
 inline void GetRequest::set_key(::std::string&& value) {
   
   key_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:raft.rpc.GetRequest.key)
+  // @@protoc_insertion_point(field_set_rvalue:raft.external.GetRequest.key)
 }
 #endif
 inline void GetRequest::set_key(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:raft.rpc.GetRequest.key)
+  // @@protoc_insertion_point(field_set_char:raft.external.GetRequest.key)
 }
 inline void GetRequest::set_key(const char* value, size_t size) {
   
   key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:raft.rpc.GetRequest.key)
+  // @@protoc_insertion_point(field_set_pointer:raft.external.GetRequest.key)
 }
 inline ::std::string* GetRequest::mutable_key() {
   
-  // @@protoc_insertion_point(field_mutable:raft.rpc.GetRequest.key)
+  // @@protoc_insertion_point(field_mutable:raft.external.GetRequest.key)
   return key_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* GetRequest::release_key() {
-  // @@protoc_insertion_point(field_release:raft.rpc.GetRequest.key)
+  // @@protoc_insertion_point(field_release:raft.external.GetRequest.key)
   
   return key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -867,7 +867,7 @@ inline void GetRequest::set_allocated_key(::std::string* key) {
     
   }
   key_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), key);
-  // @@protoc_insertion_point(field_set_allocated:raft.rpc.GetRequest.key)
+  // @@protoc_insertion_point(field_set_allocated:raft.external.GetRequest.key)
 }
 
 // -------------------------------------------------------------------
@@ -879,13 +879,13 @@ inline void GetReply::clear_status() {
   status_ = false;
 }
 inline bool GetReply::status() const {
-  // @@protoc_insertion_point(field_get:raft.rpc.GetReply.status)
+  // @@protoc_insertion_point(field_get:raft.external.GetReply.status)
   return status_;
 }
 inline void GetReply::set_status(bool value) {
   
   status_ = value;
-  // @@protoc_insertion_point(field_set:raft.rpc.GetReply.status)
+  // @@protoc_insertion_point(field_set:raft.external.GetReply.status)
 }
 
 // string value = 2;
@@ -893,41 +893,41 @@ inline void GetReply::clear_value() {
   value_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& GetReply::value() const {
-  // @@protoc_insertion_point(field_get:raft.rpc.GetReply.value)
+  // @@protoc_insertion_point(field_get:raft.external.GetReply.value)
   return value_.GetNoArena();
 }
 inline void GetReply::set_value(const ::std::string& value) {
   
   value_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:raft.rpc.GetReply.value)
+  // @@protoc_insertion_point(field_set:raft.external.GetReply.value)
 }
 #if LANG_CXX11
 inline void GetReply::set_value(::std::string&& value) {
   
   value_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:raft.rpc.GetReply.value)
+  // @@protoc_insertion_point(field_set_rvalue:raft.external.GetReply.value)
 }
 #endif
 inline void GetReply::set_value(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   value_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:raft.rpc.GetReply.value)
+  // @@protoc_insertion_point(field_set_char:raft.external.GetReply.value)
 }
 inline void GetReply::set_value(const char* value, size_t size) {
   
   value_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:raft.rpc.GetReply.value)
+  // @@protoc_insertion_point(field_set_pointer:raft.external.GetReply.value)
 }
 inline ::std::string* GetReply::mutable_value() {
   
-  // @@protoc_insertion_point(field_mutable:raft.rpc.GetReply.value)
+  // @@protoc_insertion_point(field_mutable:raft.external.GetReply.value)
   return value_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* GetReply::release_value() {
-  // @@protoc_insertion_point(field_release:raft.rpc.GetReply.value)
+  // @@protoc_insertion_point(field_release:raft.external.GetReply.value)
   
   return value_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -938,7 +938,7 @@ inline void GetReply::set_allocated_value(::std::string* value) {
     
   }
   value_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set_allocated:raft.rpc.GetReply.value)
+  // @@protoc_insertion_point(field_set_allocated:raft.external.GetReply.value)
 }
 
 // -------------------------------------------------------------------
@@ -959,7 +959,7 @@ inline void GetReply::set_allocated_value(::std::string* value) {
 
 // @@protoc_insertion_point(namespace_scope)
 
-}  // namespace rpc
+}  // namespace external
 }  // namespace raft
 
 // @@protoc_insertion_point(global_scope)

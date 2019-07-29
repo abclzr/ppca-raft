@@ -7,7 +7,7 @@
 namespace raft {
     struct Server::Impl {
         std::vector<std::unique_ptr<rpc::RaftRpc::Stub>> stubs;
-        std::vector<std::unique_ptr<rpc::External::Stub>> Exstubs;
+        std::vector<std::unique_ptr<external::External::Stub>> Exstubs;
         std::atomic<std::size_t> cur{0};
     };
 
@@ -22,14 +22,19 @@ namespace raft {
             if (srv.second.get_value<std::string>() != local_address)
                 srvList.emplace_back(srv.second.get_value<std::string>());
 
+        uint32_t cnt = 0;
         for (const auto &srv : srvList) {
             pImpl->stubs.emplace_back(rpc::RaftRpc::NewStub(grpc::CreateChannel(
                     srv, grpc::InsecureChannelCredentials())));
+            getServer[srv] = cnt++;
         }
 
-        pImpl->Exstubs.emplace_back(rpc::External::NewStub((grpc::CreateChannel(
+        pImpl->Exstubs.emplace_back(external::External::NewStub((grpc::CreateChannel(
                     Clientaddr, grpc::InsecureChannelCredentials()))));
 
+        currentTerm = 0;
+        lastApplied = 0;
+        commitIndex = 0;
         work_is_done = false;
         log.emplace_back(0, 0, "", "");
 
@@ -37,46 +42,40 @@ namespace raft {
         heart.Run();
     }
 
-    void Server::put(std::string k, std::string v) {
-    }
-
-    void Server::get(std::string k) {
-    }
-
     void Server::RunExternal() {
         ExternalRpcService service;
-            service.bindGet([this](std::string k) {
-                get(k);
-            });
-            service.bindPut([this](std::string k, std::string v) {
-                put(k, v);
-            });
-            grpc::ServerBuilder builder;
-            builder.AddListeningPort(local_address, grpc::InsecureServerCredentials());
-            builder.RegisterService(&service);
-            serverExternal = builder.BuildAndStart();
-            serverExternal->Wait();
+        service.bindPut([this](const external::PutRequest *request, external::Reply *response) {
+            put(request, response);
+        });
+        service.bindGet([this](const external::GetRequest *request, external::Reply *response) {
+            get(request, response);
+        });
+        grpc::ServerBuilder builder;
+        builder.AddListeningPort(local_address, grpc::InsecureServerCredentials());
+        builder.RegisterService(&service);
+        serverExternal = builder.BuildAndStart();
+        serverExternal->Wait();
     }
 
     void Server::RunRaft() {
-            RaftRpcService service;
-            service.bindrequestAE([this](const rpc::RequestAppendEntries *request, rpc::Reply *reply) {
-                requestAE(request, reply);
-            });
-            service.bindrequestV([this](const rpc::RequestVote *request, rpc::Reply *reply) {
-                requestV(request, reply);
-            });
-            service.bindreplyAE([this](const rpc::ReplyAppendEntries *request, rpc::Reply *reply) {
-                replyAE(request, reply);
-            });
-            service.bindreplyV([this](const rpc::ReplyVote *request, rpc::Reply *reply) {
-                replyV(request, reply);
-            });
-            grpc::ServerBuilder builder;
-            builder.AddListeningPort(local_address, grpc::InsecureServerCredentials());
-            builder.RegisterService(&service);
-            serverRaft = builder.BuildAndStart();
-            serverRaft->Wait();
+        RaftRpcService service;
+        service.bindrequestAE([this](const rpc::RequestAppendEntries *request, rpc::Reply *reply) {
+            requestAE(request, reply);
+        });
+        service.bindrequestV([this](const rpc::RequestVote *request, rpc::Reply *reply) {
+            requestV(request, reply);
+        });
+        service.bindreplyAE([this](const rpc::ReplyAppendEntries *request, rpc::Reply *reply) {
+            replyAE(request, reply);
+        });
+        service.bindreplyV([this](const rpc::ReplyVote *request, rpc::Reply *reply) {
+            replyV(request, reply);
+        });
+        grpc::ServerBuilder builder;
+        builder.AddListeningPort(local_address, grpc::InsecureServerCredentials());
+        builder.RegisterService(&service);
+        serverRaft = builder.BuildAndStart();
+        serverRaft->Wait();
     }
 
     void Server::RunProcess() {
@@ -84,8 +83,10 @@ namespace raft {
         while (!work_is_done) {
             cv.wait(lock, [this](){return !q.empty();});
             while (!q.empty()) {
-
+                processEvent(q.front());
+                q.pop();
             }
+            mu.unlock();
         }
     }
 
@@ -105,7 +106,7 @@ namespace raft {
         work_is_done = true;
         t1.interrupt();
         t2.interrupt();
-        t3.interrupt();
+        cv.notify_one();
         if (t1.joinable()) t1.join();
         if (t2.joinable()) t2.join();
         if (t3.joinable()) t3.join();
@@ -123,6 +124,150 @@ namespace raft {
     uint64_t Server::get_lastlogterm() {
         return (--log.end())->term;
     }
+
+    void Server::processEvent(const event &e) {
+        switch (e.type) {
+            case EventType::Election:
+                break;
+            case EventType::ElectionDone:
+                break;
+            case EventType::HeartBeat:
+                break;
+            case EventType::RequestAppendEntries:
+                AppendEntries(e.RequestAE);
+                break;
+            case EventType::RequestVote:
+                Vote(e.RequestV);
+                break;
+            case EventType::Put:
+                Put(e.put);
+                break;
+            case EventType::Get:
+                Get(e.get);
+                break;
+            case EventType::ReplyAppendEntries:
+                ReplyAppendEntries(e.ReplyAE);
+                break;
+            case EventType::ReplyVote:
+                ReplyVote(e.ReplyV);
+                break;
+        }
+    }
+
+    void Server::put(const external::PutRequest *request, external::Reply *response) {
+        boost::lock_guard<boost::mutex> lock(mu);
+        q.push(event(request));
+        cv.notify_one();
+    }
+
+    void Server::get(const external::GetRequest *request, external::Reply *response) {
+        boost::lock_guard<boost::mutex> lock(mu);
+        q.push(event(request));
+        cv.notify_one();
+    }
+
+    void Server::requestAE(const rpc::RequestAppendEntries *request, rpc::Reply *reply) {
+        boost::lock_guard<boost::mutex> lock(mu);
+        q.push(event(request));
+        cv.notify_one();
+    }
+
+    void Server::requestV(const rpc::RequestVote *request, rpc::Reply *reply) {
+        boost::lock_guard<boost::mutex> lock(mu);
+        q.push(event(request));
+        cv.notify_one();
+    }
+
+    void Server::replyAE(const rpc::ReplyAppendEntries *request, rpc::Reply *reply) {
+        boost::lock_guard<boost::mutex> lock(mu);
+        q.push(event(request));
+        cv.notify_one();
+    }
+
+    void Server::replyV(const rpc::ReplyVote *request, rpc::Reply *reply) {
+        boost::lock_guard<boost::mutex> lock(mu);
+        q.push(event(request));
+        cv.notify_one();
+    }
+
+    void Server::AppendEntries(const event::RequestAppendEntries *p) {
+        grpc::ClientContext ctx;
+        rpc::ReplyAppendEntries reply;
+        rpc::Reply rp;
+
+        reply.set_followerid(local_address);
+        reply.set_term(currentTerm);
+        if (p->term < currentTerm) reply.set_ans(false);
+        else if (getTerm(p->prevLogIndex) != p->prevLogTerm) reply.set_ans(false);
+        else {
+            int num = log.size() - p->prevLogIndex - 1;
+            for (int i = 1; i <= num; ++i) log.pop_back();
+            for (const auto & i : p->entries)
+                log.emplace_back(i.term, log.size(), i.key, i.args);
+            reply.set_ans(true);
+        }
+
+        if (p->leaderCommit > commitIndex) commitIndex = std::min(p->leaderCommit, log.size() - 1);
+
+        pImpl->stubs[getServer[p->leaderID]]->ReplyAE(&ctx, reply, &rp);
+    }
+
+    void Server::Vote(const event::RequestVote *p) {
+        grpc::ClientContext ctx;
+        rpc::ReplyVote reply;
+        rpc::Reply rp;
+
+        reply.set_followerid(local_address);
+        reply.set_term(currentTerm);
+        if (p->term < currentTerm) reply.set_ans(false);
+        else if (!votedFor.empty()) reply.set_ans(false);
+        else if (get_lastlogterm() < p->lastLogTerm ||
+            (get_lastlogterm() == p->lastLogTerm && get_lastlogindex() < p->lastLogIndex)) {
+            votedFor = p->candidateID;
+            reply.set_ans(true);
+        } else
+            reply.set_ans(false);
+
+        pImpl->stubs[getServer[p->candidateID]]->ReplyV(&ctx, reply, &rp);
+    }
+
+    void Server::replyAppendEntries(const event::ReplyAppendEntries *p) {
+        if (p->ans) matchIndex[getServer[p->followerID]] = log.size() - 1;
+    }
+
+    void Server::replyVote(const event::ReplyVote *p) {
+        if (p->ans) ++votesnum;
+    }
+
+    void Server::Put(const event::Put *p) {
+        if (getState() == State::Leader) {
+            grpc::ClientContext ctx;
+            external::PutReply reply;
+            external::Reply rp;
+
+            reply.set
+        } else {
+
+        }
+    }
+
+    void Server::Get(const event::Get *p) {
+        if (getState() == State::Leader) {
+
+        } else {
+
+        }
+    }
+
+    uint64_t Server::getTerm(uint64_t index) {
+        if (index >= log.size()) return 0;
+        return log[index].term;
+    }
+
+    State Server::getState() {
+        return heart.state;
+    }
+
 
     Server::LogEntry::LogEntry(uint64_t _term, uint64_t _index, const std::string &_key, const std::string &_args)
          : term(_term), index(_index), key(_key), args(_args) {}

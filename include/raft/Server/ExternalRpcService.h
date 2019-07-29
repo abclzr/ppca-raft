@@ -11,20 +11,22 @@
 
 namespace raft {
 
-class ExternalRpcService : public rpc::External::Service {
+class ExternalRpcService : public external::External::Service {
 public:
   template <class Func> void bindPut(Func &&f) { put = std::forward<Func>(f); }
 
   template <class Func> void bindGet(Func &&f) { get = std::forward<Func>(f); }
 
-  grpc::Status Put(grpc::ServerContext *context, const rpc::PutRequest *request, rpc::Reply *response) override;
-  grpc::Status Get(grpc::ServerContext *context, const rpc::GetRequest *request, rpc::Reply *response) override;
-  grpc::Status ReplyPut(grpc::ServerContext *context, const rpc::PutReply *request, rpc::Reply *response) override;
-  grpc::Status ReplyGet(grpc::ServerContext *context, const rpc::GetReply *request, rpc::Reply *response) override;
+  grpc::Status Put(grpc::ServerContext *context, const external::PutRequest *request, external::Reply *response) override;
+  grpc::Status Get(grpc::ServerContext *context, const external::GetRequest *request, external::Reply *response) override;
+  grpc::Status ReplyPut(grpc::ServerContext *context, const external::PutReply *request, external::Reply *response) override;
+  grpc::Status ReplyGet(grpc::ServerContext *context, const external::GetReply *request, external::Reply *response) override;
 
 private:
-  std::function<void(std::string, std::string)> put;
-  std::function<void(std::string)> get;
+  std::function<void(const external::PutRequest *request, external::Reply *response)> put;
+  std::function<void(const external::GetRequest *request, external::Reply *response)> get;
+  std::function<void(const external::PutReply *request, external::Reply *response)> replyput;
+  std::function<void(const external::GetReply *request, external::Reply *response)> replyget;
 };
 
 } // namespace raft
