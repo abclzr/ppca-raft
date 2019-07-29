@@ -7,7 +7,8 @@
 namespace raft {
     struct Server::Impl {
         std::vector<std::unique_ptr<rpc::RaftRpc::Stub>> stubs;
-        std::vector<std::unique_ptr<external::External::Stub>> Exstubs;
+        std::vector<std::unique_ptr<external::External::Stub>> redirectStubs;
+        std::vector<std::unique_ptr<external::External::Stub>> clientStubs;
         std::atomic<std::size_t> cur{0};
     };
 
@@ -26,10 +27,12 @@ namespace raft {
         for (const auto &srv : srvList) {
             pImpl->stubs.emplace_back(rpc::RaftRpc::NewStub(grpc::CreateChannel(
                     srv, grpc::InsecureChannelCredentials())));
+            pImpl->redirectStubs.emplace_back(external::External::NewStub(grpc::CreateChannel(
+                    srv, grpc::InsecureChannelCredentials())));
             getServer[srv] = cnt++;
         }
 
-        pImpl->Exstubs.emplace_back(external::External::NewStub((grpc::CreateChannel(
+        pImpl->clientStubs.emplace_back(external::External::NewStub((grpc::CreateChannel(
                     Clientaddr, grpc::InsecureChannelCredentials()))));
 
         currentTerm = 0;
@@ -128,10 +131,13 @@ namespace raft {
     void Server::processEvent(const event &e) {
         switch (e.type) {
             case EventType::Election:
+                election();
                 break;
             case EventType::ElectionDone:
+                electionDone();
                 break;
             case EventType::HeartBeat:
+                heartBeat();
                 break;
             case EventType::RequestAppendEntries:
                 AppendEntries(e.RequestAE);
@@ -146,10 +152,10 @@ namespace raft {
                 Get(e.get);
                 break;
             case EventType::ReplyAppendEntries:
-                ReplyAppendEntries(e.ReplyAE);
+                replyAppendEntries(e.ReplyAE);
                 break;
             case EventType::ReplyVote:
-                ReplyVote(e.ReplyV);
+                replyVote(e.ReplyV);
                 break;
         }
     }
@@ -195,6 +201,8 @@ namespace raft {
         rpc::ReplyAppendEntries reply;
         rpc::Reply rp;
 
+        votedFor.clear();
+        leaderAddress = p->leaderID;
         reply.set_followerid(local_address);
         reply.set_term(currentTerm);
         if (p->term < currentTerm) reply.set_ans(false);
@@ -244,18 +252,29 @@ namespace raft {
             grpc::ClientContext ctx;
             external::PutReply reply;
             external::Reply rp;
-
-            reply.set
+            reply.set_status(true);
+            pImpl->clientStubs[0]->ReplyPut(&ctx, reply, &rp);
         } else {
-
+            grpc::ClientContext ctx;
+            external::PutRequest request;
+            external::Reply reply;
+            pImpl->redirectStubs[getServer[leaderAddress]]->Put(&ctx, request, &reply);
         }
     }
 
     void Server::Get(const event::Get *p) {
         if (getState() == State::Leader) {
-
+            grpc::ClientContext ctx;
+            external::GetReply reply;
+            external::Reply rp;
+            reply.set_status(true);
+            reply.set_value(table[p->key]);
+            pImpl->clientStubs[0]->ReplyGet(&ctx, reply, &rp);
         } else {
-
+            grpc::ClientContext ctx;
+            external::GetRequest request;
+            external::Reply reply;
+            pImpl->redirectStubs[getServer[leaderAddress]]->Get(&ctx, request, &reply);
         }
     }
 
@@ -266,6 +285,30 @@ namespace raft {
 
     State Server::getState() {
         return heart.state;
+    }
+
+    void Server::election() {
+        votesnum = 0;
+        for (const auto & i : pImpl->stubs) {
+            grpc::ClientContext ctx;
+            rpc::RequestVote request;
+            rpc::Reply reply;
+            request.set_term(currentTerm);
+            request.set_candidateid(local_address);
+            request.set_lastlogterm(get_lastlogterm());
+            request.set_lastlogindex(get_lastlogindex());
+            i->RequestV(&ctx, request, &reply);
+        }
+    }
+
+    void Server::electionDone() {
+        heart.electionResult(votesnum > clustsize / 2);
+    }
+
+    void Server::heartBeat() {
+        for (const auto & i : pImpl->stubs) {
+
+        }
     }
 
 

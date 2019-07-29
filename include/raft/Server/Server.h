@@ -54,6 +54,9 @@ namespace raft {
         void processEvent(const event &);
 
         //process event
+        void election();
+        void electionDone();
+        void heartBeat();
         void AppendEntries(const event::RequestAppendEntries *p);
         void Vote(const event::RequestVote *p);
         void replyAppendEntries(const event::ReplyAppendEntries *p);
@@ -81,6 +84,8 @@ namespace raft {
         bool work_is_done;
         uint64_t votesnum;
         uint64_t clustsize;
+        std::string leaderAddress;
+
         uint64_t currentTerm;
         std::string votedFor;
         struct LogEntry {

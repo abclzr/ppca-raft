@@ -30,6 +30,8 @@ namespace raft {
 
         void Stop();
 
+        void electionResult(bool flag);
+
         std::function<bool(uint64_t)> election;
         std::function<void()> declareleader;
         std::function<void()> sendHeartBeat;
