@@ -30,25 +30,29 @@ namespace raft {
         std::unique_ptr<Impl> pImpl;
         std::string local_address;
 
-        //send AppendEntriesRPC/RequestVoteRPC to a certain server
-        std::unique_ptr<rpc::Reply> sendAppendEntriesMessage(const std::unique_ptr<rpc::RaftRpc::Stub> &, uint64_t);
-        std::unique_ptr<rpc::Reply> requestVote(const std::unique_ptr<rpc::RaftRpc::Stub> &);
-
         //communicate with client as a leader
         void put(std::string, std::string);
-        std::string get(std::string);
+        void get(std::string);
 
-        //communicate with leader(not itself) as a follower
-        void append(const rpc::RequestAppendEntries *, rpc::Reply *);
-        void vote(const rpc::RequestVote *, rpc::Reply *);
+        //communicate between servers
+        void requestAE(const rpc::RequestAppendEntries *request, rpc::Reply *reply);
+        void requestV(const rpc::RequestVote *request, rpc::Reply *reply);
+        void replyAE(const rpc::ReplyAppendEntries *request, rpc::Reply *reply);
+        void replyV(const rpc::ReplyVote *request, rpc::Reply *reply);
 
         uint64_t get_lastlogindex();
         uint64_t get_lastlogterm();
+
+        //event_queue
+        boost::condition_variable cv;
+        boost::mutex mu;
+        std::queue<event> q;
 
     public:
         Server(const std::string &, uint64_t, const std::string &);
         void RunExternal();
         void RunRaft();
+        void RunProcess();
         //start the server
         void Run();
         void Stop();
@@ -56,6 +60,7 @@ namespace raft {
 
         boost::thread t1;
         boost::thread t2;
+        boost::thread t3;
         std::unique_ptr<grpc::Server> serverExternal;
         std::unique_ptr<grpc::Server> serverRaft;
         boost::condition_variable cv;
@@ -80,14 +85,7 @@ namespace raft {
         std::vector<uint64_t> nextIndex;
         std::vector<uint64_t> matchIndex;
 
-        //heartbeatcontroller, when run it, it will start a new thread to control its state and time out
-        //it needs to bind three local function : election, declare leader and send heartbeats
         HeartBeatController heart;
-        
-        std::vector<LogEntry>::iterator findLog(uint64_t);
-        bool election(uint64_t);
-        void declareleader();
-        void sendHeartBeat();
     };
 
 }

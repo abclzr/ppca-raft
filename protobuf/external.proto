@@ -28,7 +28,7 @@ service External {
 
   rpc Get (GetRequest) returns (Reply) {}
 
-  rpc ReplyPut (PutRequest) returns (Reply) {}
+  rpc ReplyPut (PutReply) returns (Reply) {}
 
   rpc ReplyGet(GetReply) returns (Reply) {}
 }

@@ -17,14 +17,20 @@ namespace raft {
 
     class RaftRpcService : public rpc::RaftRpc::Service {
     public:
-        template <class Func> void bindAppend(Func &&f) { append = std::forward<Func>(f); }
-        template <class Func> void bindVote(Func &&f) { vote = std::forward<Func>(f); }
-        grpc::Status AppendEntries(grpc::ServerContext *context, const rpc::AppendEntriesMessage *request, rpc::Reply *reply) override ;
-        grpc::Status RequestVote(grpc::ServerContext *context, const rpc::RequestVoteMessage *request, rpc::Reply *reply) override ;
+        template <class Func> void bindrequestAE(Func &&f) { requestAE = std::forward<Func>(f); }
+        template <class Func> void bindrequestV(Func &&f) { requestV = std::forward<Func>(f); }
+        template <class Func> void bindreplyAE(Func &&f) { replyAE = std::forward<Func>(f); }
+        template <class Func> void bindreplyV(Func &&f) { replyV = std::forward<Func>(f); }
+        grpc::Status RequestAE(grpc::ServerContext *context, const rpc::RequestAppendEntries *request, rpc::Reply *reply) override ;
+        grpc::Status RequestV(grpc::ServerContext *context, const rpc::RequestVote *request, rpc::Reply *reply) override ;
+        grpc::Status ReplyAE(grpc::ServerContext *context, const rpc::ReplyAppendEntries *, rpc::Reply *reply) override ;
+        grpc::Status ReplyV(grpc::ServerContext *context, const rpc::ReplyVote *, rpc::Reply *reply) override ;
 
     private:
-        std::function<void(const rpc::AppendEntriesMessage *, rpc::Reply *)> append;
-        std::function<void(const rpc::RequestVoteMessage *, rpc::Reply *)> vote;
+        std::function<void(const rpc::RequestAppendEntries *, rpc::Reply *)> requestAE;
+        std::function<void(const rpc::RequestVote *, rpc::Reply *)> requestV;
+        std::function<void(const rpc::ReplyAppendEntries *, rpc::Reply *)> replyAE;
+        std::function<void(const rpc::ReplyVote *, rpc::Reply *)> replyV;
     };
 
 }

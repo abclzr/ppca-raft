@@ -17,15 +17,14 @@ public:
 
   template <class Func> void bindGet(Func &&f) { get = std::forward<Func>(f); }
 
-  grpc::Status Put(grpc::ServerContext *context, const rpc::PutRequest *request,
-                   rpc::PutReply *response) override;
-
-  grpc::Status Get(grpc::ServerContext *context, const rpc::GetRequest *request,
-                   rpc::GetReply *response) override;
+  grpc::Status Put(grpc::ServerContext *context, const rpc::PutRequest *request, rpc::Reply *response) override;
+  grpc::Status Get(grpc::ServerContext *context, const rpc::GetRequest *request, rpc::Reply *response) override;
+  grpc::Status ReplyPut(grpc::ServerContext *context, const rpc::PutReply *request, rpc::Reply *response) override;
+  grpc::Status ReplyGet(grpc::ServerContext *context, const rpc::GetReply *request, rpc::Reply *response) override;
 
 private:
   std::function<void(std::string, std::string)> put;
-  std::function<std::string(std::string)> get;
+  std::function<void(std::string)> get;
 };
 
 } // namespace raft

@@ -182,17 +182,17 @@ const char descriptor_table_protodef_external_2eproto[] =
   "\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"\032\n\010PutReply"
   "\022\016\n\006status\030\001 \001(\010\"\031\n\nGetRequest\022\013\n\003key\030\001 "
   "\001(\t\")\n\010GetReply\022\016\n\006status\030\001 \001(\010\022\r\n\005value"
-  "\030\002 \001(\t\"\007\n\005Reply2\322\001\n\010External\022.\n\003Put\022\024.ra"
+  "\030\002 \001(\t\"\007\n\005Reply2\320\001\n\010External\022.\n\003Put\022\024.ra"
   "ft.rpc.PutRequest\032\017.raft.rpc.Reply\"\000\022.\n\003"
   "Get\022\024.raft.rpc.GetRequest\032\017.raft.rpc.Rep"
-  "ly\"\000\0223\n\010ReplyPut\022\024.raft.rpc.PutRequest\032\017"
-  ".raft.rpc.Reply\"\000\0221\n\010ReplyGet\022\022.raft.rpc"
-  ".GetReply\032\017.raft.rpc.Reply\"\000b\006proto3"
+  "ly\"\000\0221\n\010ReplyPut\022\022.raft.rpc.PutReply\032\017.r"
+  "aft.rpc.Reply\"\000\0221\n\010ReplyGet\022\022.raft.rpc.G"
+  "etReply\032\017.raft.rpc.Reply\"\000b\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_external_2eproto = {
   false, InitDefaults_external_2eproto, 
   descriptor_table_protodef_external_2eproto,
-  "external.proto", &assign_descriptors_table_external_2eproto, 396,
+  "external.proto", &assign_descriptors_table_external_2eproto, 394,
 };
 
 void AddDescriptors_external_2eproto() {

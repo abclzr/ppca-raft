@@ -6,15 +6,26 @@
 
 namespace raft {
 
-    grpc::Status RaftRpcService::AppendEntries(grpc::ServerContext *context, const rpc::AppendEntriesMessage *request,
-                                               rpc::Reply *reply) {
-        append(request, reply);
+    grpc::Status RaftRpcService::RequestAE(grpc::ServerContext *context,
+                                                      const raft::rpc::RequestAppendEntries *request,
+                                                      raft::rpc::Reply *reply) {
+        requestAE(request, reply);
         return grpc::Status::OK;
     }
-
-    grpc::Status RaftRpcService::RequestVote(grpc::ServerContext *context, const rpc::RequestVoteMessage *request,
+    grpc::Status RaftRpcService::RequestV(grpc::ServerContext *context, const rpc::RequestVote *request,
                                              rpc::Reply *reply) {
-        vote(request, reply);
+        requestV(request, reply);
+        return grpc::Status::OK;
+    }
+    grpc::Status RaftRpcService::ReplyAE(grpc::ServerContext *context,
+                                           const raft::rpc::ReplyAppendEntries *request,
+                                           raft::rpc::Reply *reply) {
+        replyAE(request, reply);
+        return grpc::Status::OK;
+    }
+    grpc::Status RaftRpcService::ReplyV(grpc::ServerContext *context, const rpc::ReplyVote *request,
+                                          rpc::Reply *reply) {
+        replyV(request, reply);
         return grpc::Status::OK;
     }
 }
