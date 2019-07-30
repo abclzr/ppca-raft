@@ -5,6 +5,7 @@
 
 
 int main() {
+    std::ios::sync_with_stdio(false);
     std::cout << "Hello, world!" << std::endl;
     raft::Client client(std::string(CMAKE_SOURCE_DIR) + "/cmake-build-debug/example/RaftConfig0.json");
     raft::Server server1(std::string(CMAKE_SOURCE_DIR) + "/cmake-build-debug/example/RaftConfig1.json", 2, "");
@@ -15,6 +16,7 @@ int main() {
     server2.Run();
 
     sleep(10);
+    std::cout << "Sleep Over." << std::endl;
 
     client.Stop();
     server1.Stop();

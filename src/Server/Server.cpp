@@ -88,16 +88,15 @@ namespace raft {
         serverRaft->Wait();
     }
 
-    void Server::RunProcess() {
+    void Server::RunProcess() {//TODO: unique_lock and conditional virables
         if (DEBUG) std::cout << std::setw(20) << local_address << " : Start Process" << std::endl;
-        boost::unique_lock<boost::mutex> lock(mu);
         while (!work_is_done) {
-            cv.wait(lock, [this](){return !q.empty();});
+            boost::unique_lock<boost::mutex> lock(mu, boost::defer_lock);
+            cv.wait(lock, [this]{return !q.empty();});
             while (!q.empty()) {
                 processEvent(q.front());
                 q.pop();
             }
-            mu.unlock();
         }
     }
 
@@ -122,6 +121,7 @@ namespace raft {
         if (t2.joinable()) t2.join();
         if (t3.joinable()) t3.join();
         heart.Stop();
+        mu.unlock();
     }
 
     Server::~Server() {
@@ -187,9 +187,11 @@ namespace raft {
     }
 
     void Server::requestV(const rpc::RequestVote *request, rpc::Reply *reply) {
+        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : rpc received requestVote" <<std::endl;}
         boost::lock_guard<boost::mutex> lock(mu);
         q.push(event(request));
         cv.notify_one();
+        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : add requestVote to queue!" <<std::endl;}
     }
 
     void Server::replyAE(const rpc::ReplyAppendEntries *request, rpc::Reply *reply) {
@@ -327,6 +329,7 @@ namespace raft {
             request.set_lastlogterm(get_lastlogterm());
             request.set_lastlogindex(get_lastlogindex());
             i->RequestV(&ctx, request, &reply);
+            if (DEBUG) {std::cerr << std::setw(20) << local_address << " : sendVoteRequest!"<<std::endl;}
         }
     }
 
@@ -353,6 +356,7 @@ namespace raft {
             }
             request.set_leadercommit(commitIndex);
             i->RequestAE(&ctx, request, &reply);
+            if (DEBUG) {std::cerr << std::setw(20) << local_address << " : sendAppendEntriesRequest!"<<std::endl;}
         }
     }
 
