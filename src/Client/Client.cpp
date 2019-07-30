@@ -8,13 +8,13 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include <grpc++/create_channel.h>
-
+#include "raft/Server/config.h"
 #include "raft/Common/external.grpc.pb.h"
 
 namespace raft {
 
 struct Client::Impl {
-  std::vector<std::unique_ptr<rpc::External::Stub>> stubs;
+  std::vector<std::unique_ptr<external::External::Stub>> stubs;
   std::atomic<std::size_t> cur{0};
 }; /* struct Client::Impl */
 
@@ -28,12 +28,14 @@ Client::Client(const std::string &filename) : pImpl(std::make_unique<Impl>()) {
   pt::ptree tree;
   pt::read_json(filename, tree);
 
+    for (auto &&srv : tree.get_child("local"))
+        local_address = srv.second.get_value<std::string>();
   std::vector<std::string> srvList;
   for (auto &&srv : tree.get_child("serverList"))
     srvList.emplace_back(srv.second.get_value<std::string>());
 
   for (const auto & srv : srvList) {
-    pImpl->stubs.emplace_back(rpc::External::NewStub(grpc::CreateChannel(
+    pImpl->stubs.emplace_back(external::External::NewStub(grpc::CreateChannel(
         srv, grpc::InsecureChannelCredentials())));
   }
 }
@@ -55,14 +57,13 @@ void Client::Put(std::string key, std::string value, uint64_t timeout) {
     ctx.set_deadline(startTimePoint + std::chrono::milliseconds(timeout));
     ctx.set_idempotent(true);
 
-    rpc::PutRequest request;
+    external::PutRequest request;
     request.set_key(key);
     request.set_value(value);
-    rpc::PutReply reply;
+    external::Reply reply;
     auto status = stub->Put(&ctx, request, &reply);
 
-    if (status.ok() && reply.status())
-      return;
+    return;
     pImpl->cur++;
   }
 
@@ -78,17 +79,51 @@ std::string Client::Get(std::string key, uint64_t timeout) {
     ctx.set_deadline(startTimePoint + std::chrono::milliseconds(timeout));
     ctx.set_idempotent(true);
 
-    rpc::GetRequest request;
+    external::GetRequest request;
     request.set_key(key);
-    rpc::GetReply reply;
+    external::Reply reply;
     auto status = stub->Get(&ctx, request, &reply);
 
-    if (status.ok() && reply.status())
-      return reply.value();
+    if (status.ok())
+      return "";
     pImpl->cur++;
   }
 
   throw RequestTimeout();
 }
+
+    void Client::Run() {
+        boost::function0<void> f1 = boost::bind(&Client::RunThread, this);
+        th = boost::thread(f1);
+    }
+
+    void Client::Stop() {
+        ser->Shutdown();
+        if (th.joinable()) th.join();
+    }
+
+    void Client::RunThread() {
+        if (DEBUG) std::cout << std::setw(20) << local_address << " : Start RunThread" << std::endl;
+        ExternalRpcService service;
+        service.bindReplyPut([this](const external::PutReply *request, external::Reply *response) {
+            replyput(request, response);
+        });
+        service.bindReplyGet([this](const external::GetReply *request, external::Reply *response) {
+            replyget(request, response);
+        });
+        grpc::ServerBuilder builder;
+        builder.AddListeningPort(local_address, grpc::InsecureServerCredentials());
+        builder.RegisterService(&service);
+        ser = builder.BuildAndStart();
+        ser->Wait();
+    }
+
+    void Client::replyput(const external::PutReply *request, external::Reply *response) {
+
+    }
+
+    void Client::replyget(const external::GetReply *request, external::Reply *response) {
+        std::cout << "Client Received : " << request->value() << std::endl;
+    }
 
 } // namespace ppca

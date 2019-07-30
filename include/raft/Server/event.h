@@ -38,10 +38,10 @@ namespace raft {
         } *RequestAE;
 
         struct RequestVote {
-            uint64_t term = 1;
-            std::string candidateID = 2;
-            int64_t lastLogIndex = 3;
-            uint64_t lastLogTerm = 4;
+            uint64_t term;
+            std::string candidateID;
+            uint64_t lastLogIndex;
+            uint64_t lastLogTerm;
             explicit RequestVote(const rpc::RequestVote *);
         } *RequestV;
 
@@ -78,6 +78,7 @@ namespace raft {
         explicit event(const rpc::ReplyAppendEntries *);
         explicit event(const rpc::ReplyVote *);
 
+        std::string print() const;
     };
 
 }

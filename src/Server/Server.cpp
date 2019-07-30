@@ -12,12 +12,13 @@ namespace raft {
         std::atomic<std::size_t> cur{0};
     };
 
-    Server::Server(const std::string &filename, uint64_t _clustnum, const std::string &Clientaddr) : clustsize(_clustnum) {
+    Server::Server(const std::string &filename, uint64_t _clustnum, const std::string &Clientaddr) : pImpl(std::make_unique<Impl>()) {
         namespace pt = boost::property_tree;
         pt::ptree tree;
         pt::read_json(filename, tree);
 
-        local_address = tree.get<std::string>("local");
+        for (auto &&srv : tree.get_child("local"))
+            local_address = srv.second.get_value<std::string>();
         std::vector<std::string> srvList;
         for (auto &&srv : tree.get_child("serverList"))
             if (srv.second.get_value<std::string>() != local_address)
@@ -25,23 +26,27 @@ namespace raft {
 
         uint32_t cnt = 0;
         for (const auto &srv : srvList) {
-            pImpl->stubs.emplace_back(rpc::RaftRpc::NewStub(grpc::CreateChannel(
-                    srv, grpc::InsecureChannelCredentials())));
             pImpl->redirectStubs.emplace_back(external::External::NewStub(grpc::CreateChannel(
+                    srv, grpc::InsecureChannelCredentials())));
+            pImpl->stubs.emplace_back(rpc::RaftRpc::NewStub(grpc::CreateChannel(
                     srv, grpc::InsecureChannelCredentials())));
             getServer[srv] = cnt++;
         }
 
-        pImpl->clientStubs.emplace_back(external::External::NewStub((grpc::CreateChannel(
+        if (!Clientaddr.empty())
+            pImpl->clientStubs.emplace_back(external::External::NewStub((grpc::CreateChannel(
                     Clientaddr, grpc::InsecureChannelCredentials()))));
 
+        clustsize = _clustnum;
         currentTerm = 0;
         lastApplied = 0;
         commitIndex = 0;
         work_is_done = false;
         log.emplace_back(0, 0, "", "");
 
-        //TODO:: add heart-bind
+        heart.bindElection([this](){pushElection();});
+        heart.bindElectionDone([this](){pushElectionDone();});
+        heart.bindHeartBeat([this](){pushHearBeat();});
         heart.Run();
     }
 
@@ -57,6 +62,7 @@ namespace raft {
         builder.AddListeningPort(local_address, grpc::InsecureServerCredentials());
         builder.RegisterService(&service);
         serverExternal = builder.BuildAndStart();
+        if (DEBUG) std::cout << std::setw(20) << local_address << " : Start External" << std::endl;
         serverExternal->Wait();
     }
 
@@ -78,10 +84,12 @@ namespace raft {
         builder.AddListeningPort(local_address, grpc::InsecureServerCredentials());
         builder.RegisterService(&service);
         serverRaft = builder.BuildAndStart();
+        if (DEBUG) std::cout << std::setw(20) << local_address << " : Start Raft" << std::endl;
         serverRaft->Wait();
     }
 
     void Server::RunProcess() {
+        if (DEBUG) std::cout << std::setw(20) << local_address << " : Start Process" << std::endl;
         boost::unique_lock<boost::mutex> lock(mu);
         while (!work_is_done) {
             cv.wait(lock, [this](){return !q.empty();});
@@ -117,7 +125,6 @@ namespace raft {
     }
 
     Server::~Server() {
-        Stop();
     }
 
     uint64_t Server::get_lastlogindex() {
@@ -129,6 +136,7 @@ namespace raft {
     }
 
     void Server::processEvent(const event &e) {
+        if (DEBUG) {std::cerr << std::setw(20) << local_address << " received: " << e.print()<<std::endl;}
         switch (e.type) {
             case EventType::Election:
                 election();
@@ -201,6 +209,16 @@ namespace raft {
         rpc::ReplyAppendEntries reply;
         rpc::Reply rp;
 
+        if (getState() != State::Follower) {
+            if (getState() == State::Candidate) {
+                becomeFollower();
+            } else {
+                if (p->term > currentTerm) {
+                    currentTerm = p->term;
+                    becomeFollower();
+                }
+            }
+        }
         votedFor.clear();
         leaderAddress = p->leaderID;
         reply.set_followerid(local_address);
@@ -210,8 +228,10 @@ namespace raft {
         else {
             int num = log.size() - p->prevLogIndex - 1;
             for (int i = 1; i <= num; ++i) log.pop_back();
-            for (const auto & i : p->entries)
-                log.emplace_back(i.term, log.size(), i.key, i.args);
+            for (const auto & i : p->entries) {
+                auto ind = log.size();
+                log.emplace_back(i.term, ind, i.key, i.args);
+            }
             reply.set_ans(true);
         }
 
@@ -225,6 +245,11 @@ namespace raft {
         rpc::ReplyVote reply;
         rpc::Reply rp;
 
+        if (getState() == State::Leader && p->term > currentTerm) {
+            currentTerm = p->term;
+            becomeFollower();
+            return;
+        }
         reply.set_followerid(local_address);
         reply.set_term(currentTerm);
         if (p->term < currentTerm) reply.set_ans(false);
@@ -241,6 +266,7 @@ namespace raft {
 
     void Server::replyAppendEntries(const event::ReplyAppendEntries *p) {
         if (p->ans) matchIndex[getServer[p->followerID]] = log.size() - 1;
+        else --nextIndex[getServer[p->followerID]];
     }
 
     void Server::replyVote(const event::ReplyVote *p) {
@@ -249,6 +275,8 @@ namespace raft {
 
     void Server::Put(const event::Put *p) {
         if (getState() == State::Leader) {
+            auto ind = log.size();
+            log.emplace_back(LogEntry(currentTerm, ind, p->key, p->value));
             grpc::ClientContext ctx;
             external::PutReply reply;
             external::Reply rp;
@@ -288,7 +316,8 @@ namespace raft {
     }
 
     void Server::election() {
-        votesnum = 0;
+        becomeCandidate();
+        votesnum = 0; ++currentTerm;
         for (const auto & i : pImpl->stubs) {
             grpc::ClientContext ctx;
             rpc::RequestVote request;
@@ -302,15 +331,63 @@ namespace raft {
     }
 
     void Server::electionDone() {
-        heart.electionResult(votesnum > clustsize / 2);
+        if (votesnum > clustsize / 2) becomeLeader();
+        else becomeFollower();
     }
 
     void Server::heartBeat() {
+        int tmp = 0;
         for (const auto & i : pImpl->stubs) {
-
+            grpc::ClientContext ctx;
+            rpc::RequestAppendEntries request;
+            rpc::Reply reply;
+            request.set_term(currentTerm);
+            request.set_leaderid(local_address);
+            request.set_prevlogterm(get_lastlogterm());
+            request.set_prevlogindex(get_lastlogindex());
+            for (uint32_t j = nextIndex[tmp]; j < log.size(); ++j) {
+                rpc::Entry *p = request.add_entries();
+                p->set_term(log[j].term);
+                p->set_key(log[j].key);
+                p->set_args(log[j].args);
+            }
+            request.set_leadercommit(commitIndex);
+            i->RequestAE(&ctx, request, &reply);
         }
     }
 
+    void Server::becomeLeader() {
+        heart.becomeLeader();
+        for (auto & i : nextIndex) i = log.size();
+        for (auto & i : matchIndex) i = 0;
+        heartBeat();
+    }
+
+    void Server::becomeFollower() {
+        heart.becomeFollower();
+    }
+
+    void Server::becomeCandidate() {
+        heart.becomeCandidate();
+    }
+
+    void Server::pushElection() {
+        boost::lock_guard<boost::mutex> lock(mu);
+        q.push(event(EventType::Election));
+        cv.notify_one();
+    }
+
+    void Server::pushElectionDone() {
+        boost::lock_guard<boost::mutex> lock(mu);
+        q.push(event(EventType::ElectionDone));
+        cv.notify_one();
+    }
+
+    void Server::pushHearBeat() {
+        boost::lock_guard<boost::mutex> lock(mu);
+        q.push(event(EventType::HeartBeat));
+        cv.notify_one();
+    }
 
     Server::LogEntry::LogEntry(uint64_t _term, uint64_t _index, const std::string &_key, const std::string &_args)
          : term(_term), index(_index), key(_key), args(_args) {}

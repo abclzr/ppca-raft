@@ -5,6 +5,10 @@
 #include <memory>
 #include <string>
 #include <exception>
+#include "../Server/ExternalRpcService.h"
+#include "raft/Common/external.pb.h"
+#include "raft/Common/external.grpc.pb.h"
+#include <boost/thread.hpp>
 
 namespace raft {
 
@@ -19,10 +23,20 @@ public:
   Client& operator=(Client &&) = delete;
   ~Client();
 
+  std::string local_address;
+  std::unique_ptr<grpc::Server> ser;
+  boost::thread th;
+  void RunThread();
+  void Run();
+  void Stop();
+
   void Put(std::string key, std::string value, std::uint64_t timeout = 5000);
 
   std::string Get(std::string key, std::uint64_t timeout = 5000);
 
+  void replyput(const external::PutReply *request, external::Reply *response);
+
+  void replyget(const external::GetReply *request, external::Reply *response);
 private:
   struct Impl;
   std::unique_ptr<Impl> pImpl;

@@ -18,9 +18,9 @@ namespace raft {
         template<class Func>
         void bindElection(Func &&f) { election = std::forward<Func>(f); }
         template<class Func>
-        void bindDeclareleader(Func &&f) { declareleader = std::forward<Func>(f); }
+        void bindElectionDone(Func &&f) { electionDone = std::forward<Func>(f); }
         template<class Func>
-        void bindSendHeartBeat(Func &&f) { sendHeartBeat = std::forward<Func>(f); }
+        void bindHeartBeat(Func &&f) { heartBeat = std::forward<Func>(f); }
 
         void loop();
 
@@ -30,15 +30,17 @@ namespace raft {
 
         void Stop();
 
-        void electionResult(bool flag);
+        void becomeLeader();
+        void becomeCandidate();
+        void becomeFollower();
 
-        std::function<bool(uint64_t)> election;
-        std::function<void()> declareleader;
-        std::function<void()> sendHeartBeat;
+        std::function<void()> election;
+        std::function<void()> electionDone;
+        std::function<void()> heartBeat;
 
         boost::thread th;
         bool work_is_done;
-        State state;
+        boost::atomic<State> state;
 
         HeartBeatController();
     };

@@ -19,12 +19,14 @@ namespace raft {
     grpc::Status ExternalRpcService::ReplyPut(grpc::ServerContext *context,
                                          const external::PutReply *request,
                                          external::Reply *response) {
+        replyput(request, response);
         return grpc::Status::OK;
     }
 
     grpc::Status ExternalRpcService::ReplyGet(grpc::ServerContext *context,
                                          const external::GetReply *request,
                                          external::Reply *response) {
+        replyget(request, response);
         return grpc::Status::OK;
     }
 } // namespace raft

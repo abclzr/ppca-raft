@@ -13,14 +13,15 @@ namespace raft {
 
 class ExternalRpcService : public external::External::Service {
 public:
-  template <class Func> void bindPut(Func &&f) { put = std::forward<Func>(f); }
+    template <class Func> void bindPut(Func &&f) { put = std::forward<Func>(f); }
+    template <class Func> void bindGet(Func &&f) { get = std::forward<Func>(f); }
+    template <class Func> void bindReplyPut(Func &&f) { replyput = std::forward<Func>(f); }
+    template <class Func> void bindReplyGet(Func &&f) { replyget = std::forward<Func>(f); }
 
-  template <class Func> void bindGet(Func &&f) { get = std::forward<Func>(f); }
-
-  grpc::Status Put(grpc::ServerContext *context, const external::PutRequest *request, external::Reply *response) override;
-  grpc::Status Get(grpc::ServerContext *context, const external::GetRequest *request, external::Reply *response) override;
-  grpc::Status ReplyPut(grpc::ServerContext *context, const external::PutReply *request, external::Reply *response) override;
-  grpc::Status ReplyGet(grpc::ServerContext *context, const external::GetReply *request, external::Reply *response) override;
+    grpc::Status Put(grpc::ServerContext *context, const external::PutRequest *request, external::Reply *response) override;
+    grpc::Status Get(grpc::ServerContext *context, const external::GetRequest *request, external::Reply *response) override;
+    grpc::Status ReplyPut(grpc::ServerContext *context, const external::PutReply *request, external::Reply *response) override;
+    grpc::Status ReplyGet(grpc::ServerContext *context, const external::GetReply *request, external::Reply *response) override;
 
 private:
   std::function<void(const external::PutRequest *request, external::Reply *response)> put;

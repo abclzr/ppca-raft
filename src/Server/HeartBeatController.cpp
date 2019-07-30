@@ -26,38 +26,46 @@ void raft::HeartBeatController::loop() {
                 int randtime = ELECTION_TIME_OUT_DOWN + rand() % (ELECTION_TIME_OUT_UP - ELECTION_TIME_OUT_DOWN);
                 boost::this_thread::sleep_for(boost::chrono::milliseconds(randtime));
             } catch (boost::thread_interrupted) {
-                state = State::Follower;
                 continue;
             }
             state = State::Candidate;
+            election();
         } else if (state == State::Leader) {
             try {
                 boost::this_thread::restore_interruption ri(di);
                 boost::this_thread::sleep_for(boost::chrono::milliseconds(HEARTBEAT_TIME_OUT));
             } catch (boost::thread_interrupted) {
-                state = State::Follower;
                 continue;
             }
-            sendHeartBeat();
+            heartBeat();
         } else if (state == State::Candidate) {
-            bool flag;
             try {
-                flag = election(CANDIDATE_TIME_OUT);
+                boost::this_thread::restore_interruption ri(di);
+                boost::this_thread::sleep_for(boost::chrono::milliseconds(CANDIDATE_TIME_OUT));
             } catch (boost::thread_interrupted) {
-                state = State::Follower;
                 continue;
             }
-            if (flag) {
-                state = State::Leader;
-                declareleader();
-            } else {
-                state = State::Follower;
-            }
+            electionDone();
         }
     }
 }
 
 void raft::HeartBeatController::Stop() {
     work_is_done = true;
+    interrupt();
+}
+
+void raft::HeartBeatController::becomeLeader() {
+    state = State::Leader;
+    interrupt();
+}
+
+void raft::HeartBeatController::becomeCandidate() {
+    state = State::Candidate;
+    interrupt();
+}
+
+void raft::HeartBeatController::becomeFollower() {
+    state = State::Follower;
     interrupt();
 }

@@ -16,6 +16,8 @@
 #include "RaftRpcService.h"
 #include "raft/Common/raft.pb.h"
 #include "raft/Common/raft.grpc.pb.h"
+#include "raft/Common/external.pb.h"
+#include "raft/Common/external.grpc.pb.h"
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include "HeartBeatController.h"
@@ -45,7 +47,9 @@ namespace raft {
         void requestV(const rpc::RequestVote *request, rpc::Reply *reply);
         void replyAE(const rpc::ReplyAppendEntries *request, rpc::Reply *reply);
         void replyV(const rpc::ReplyVote *request, rpc::Reply *reply);
-
+        void pushElection();
+        void pushElectionDone();
+        void pushHearBeat();
 
         //event_queue
         boost::condition_variable cv;
@@ -63,6 +67,11 @@ namespace raft {
         void replyVote(const event::ReplyVote *p);
         void Put(const event::Put *p);
         void Get(const event::Get *p);
+
+        //pass message to HeartBeatController
+        void becomeLeader();
+        void becomeCandidate();
+        void becomeFollower();
 
     public:
         Server(const std::string &, uint64_t, const std::string &);

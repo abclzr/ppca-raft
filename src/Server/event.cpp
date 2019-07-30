@@ -51,6 +51,8 @@ raft::event::event(raft::EventType t) : type(t) {
             break;
         case EventType::ElectionDone:
             break;
+        case EventType::HeartBeat:
+            break;
         case EventType::RequestAppendEntries:
             break;
         case EventType::RequestVote:
@@ -94,4 +96,44 @@ raft::event::event(const raft::rpc::ReplyAppendEntries *p) {
 raft::event::event(const raft::rpc::ReplyVote *p) {
     ReplyV = new ReplyVote(p);
     type = EventType::ReplyVote;
+}
+
+std::string raft::event::print() const {
+    std::string ans;
+    ans.clear();
+
+    switch (type) {
+        case EventType::Election:
+            ans += "Election: ";
+            break;
+        case EventType::ElectionDone:
+            ans += "ElectionDone: ";
+            break;
+        case EventType::HeartBeat:
+            ans += "HeartBeat: ";
+            break;
+        case EventType::RequestAppendEntries:
+            ans += "RequestAppendEntries: ";
+            ans += RequestAE->leaderID;
+            break;
+        case EventType::RequestVote:
+            ans += "RequestVote: ";
+            ans += RequestV->candidateID;
+            break;
+        case EventType::Put:
+            ans += "Put: ";
+            break;
+        case EventType::Get:
+            ans += "Get: ";
+            break;
+        case EventType::ReplyAppendEntries:
+            ans += "ReplyAppendEntries: ";
+            ans += ReplyAE->followerID;
+            break;
+        case EventType::ReplyVote:
+            ans += "ReplyVote: ";
+            ans += ReplyV->followerID;
+            break;
+    }
+    return ans;
 }
