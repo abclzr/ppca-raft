@@ -29,7 +29,6 @@ void raft::HeartBeatController::loop() {
                 continue;
             }
             state = State::Candidate;
-            election();
         } else if (state == State::Leader) {
             try {
                 boost::this_thread::restore_interruption ri(di);
@@ -40,12 +39,13 @@ void raft::HeartBeatController::loop() {
             heartBeat();
         } else if (state == State::Candidate) {
             try {
+                election();
                 boost::this_thread::restore_interruption ri(di);
-                boost::this_thread::sleep_for(boost::chrono::milliseconds(CANDIDATE_TIME_OUT));
+                int randtime = ELECTION_TIME_OUT_DOWN + rand() % (ELECTION_TIME_OUT_UP - ELECTION_TIME_OUT_DOWN);
+                boost::this_thread::sleep_for(boost::chrono::milliseconds(randtime));
             } catch (boost::thread_interrupted) {
                 continue;
             }
-            electionDone();
         }
     }
 }
@@ -57,11 +57,6 @@ void raft::HeartBeatController::Stop() {
 
 void raft::HeartBeatController::becomeLeader() {
     state = State::Leader;
-    interrupt();
-}
-
-void raft::HeartBeatController::becomeCandidate() {
-    state = State::Candidate;
     interrupt();
 }
 

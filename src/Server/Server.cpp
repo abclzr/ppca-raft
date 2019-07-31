@@ -45,7 +45,6 @@ namespace raft {
         log.emplace_back(0, 0, "", "");
 
         heart.bindElection([this](){pushElection();});
-        heart.bindElectionDone([this](){pushElectionDone();});
         heart.bindHeartBeat([this](){pushHearBeat();});
         heart.Run();
     }
@@ -88,10 +87,10 @@ namespace raft {
         serverRaft->Wait();
     }
 
-    void Server::RunProcess() {//TODO: unique_lock and conditional virables
+    void Server::RunProcess() {
         if (DEBUG) std::cout << std::setw(20) << local_address << " : Start Process" << std::endl;
         while (!work_is_done) {
-            boost::unique_lock<boost::mutex> lock(mu, boost::defer_lock);
+            boost::unique_lock<boost::mutex> lock(mu);
             cv.wait(lock, [this]{return !q.empty();});
             while (!q.empty()) {
                 processEvent(q.front());
@@ -114,14 +113,13 @@ namespace raft {
         serverExternal->Shutdown();
         serverRaft->Shutdown();
         work_is_done = true;
+        heart.Stop();
         t1.interrupt();
         t2.interrupt();
-        cv.notify_one();
+        t3.interrupt();
         if (t1.joinable()) t1.join();
         if (t2.joinable()) t2.join();
         if (t3.joinable()) t3.join();
-        heart.Stop();
-        mu.unlock();
     }
 
     Server::~Server() {
@@ -187,11 +185,10 @@ namespace raft {
     }
 
     void Server::requestV(const rpc::RequestVote *request, rpc::Reply *reply) {
-        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : rpc received requestVote" <<std::endl;}
+        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : rpc receive requestVote ! " <<std::endl;}
         boost::lock_guard<boost::mutex> lock(mu);
         q.push(event(request));
         cv.notify_one();
-        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : add requestVote to queue!" <<std::endl;}
     }
 
     void Server::replyAE(const rpc::ReplyAppendEntries *request, rpc::Reply *reply) {
@@ -201,6 +198,7 @@ namespace raft {
     }
 
     void Server::replyV(const rpc::ReplyVote *request, rpc::Reply *reply) {
+        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : rpc receive Vote ! " <<std::endl;}
         boost::lock_guard<boost::mutex> lock(mu);
         q.push(event(request));
         cv.notify_one();
@@ -237,6 +235,7 @@ namespace raft {
             reply.set_ans(true);
         }
 
+        if (p->term > currentTerm) currentTerm = p->term;
         if (p->leaderCommit > commitIndex) commitIndex = std::min(p->leaderCommit, log.size() - 1);
 
         pImpl->stubs[getServer[p->leaderID]]->ReplyAE(&ctx, reply, &rp);
@@ -247,32 +246,42 @@ namespace raft {
         rpc::ReplyVote reply;
         rpc::Reply rp;
 
-        if (getState() == State::Leader && p->term > currentTerm) {
-            currentTerm = p->term;
+        if (getState() == State::Follower)
             becomeFollower();
-            return;
-        }
         reply.set_followerid(local_address);
         reply.set_term(currentTerm);
         if (p->term < currentTerm) reply.set_ans(false);
+        else if (p->term > currentTerm) {
+            reply.set_ans(true);
+            becomeFollower();
+        }
         else if (!votedFor.empty()) reply.set_ans(false);
         else if (get_lastlogterm() < p->lastLogTerm ||
-            (get_lastlogterm() == p->lastLogTerm && get_lastlogindex() < p->lastLogIndex)) {
+            (get_lastlogterm() == p->lastLogTerm && get_lastlogindex() <= p->lastLogIndex)) {
             votedFor = p->candidateID;
             reply.set_ans(true);
         } else
             reply.set_ans(false);
 
+        if (p->term > currentTerm) currentTerm = p->term;
         pImpl->stubs[getServer[p->candidateID]]->ReplyV(&ctx, reply, &rp);
+        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : Vote Successfully " <<reply.ans()<<std::endl;}
     }
 
     void Server::replyAppendEntries(const event::ReplyAppendEntries *p) {
-        if (p->ans) matchIndex[getServer[p->followerID]] = log.size() - 1;
-        else --nextIndex[getServer[p->followerID]];
+        if (getState() == State::Leader) {
+            if (p->ans) matchIndex[getServer[p->followerID]] = log.size() - 1;
+            else --nextIndex[getServer[p->followerID]];
+        }
     }
 
     void Server::replyVote(const event::ReplyVote *p) {
-        if (p->ans) ++votesnum;
+        if (getState() == State::Candidate) {
+            if (p->ans) ++votesnum;
+            if (votesnum > clustsize / 2) {
+                becomeLeader();
+            }
+        }
     }
 
     void Server::Put(const event::Put *p) {
@@ -318,8 +327,9 @@ namespace raft {
     }
 
     void Server::election() {
-        becomeCandidate();
-        votesnum = 0; ++currentTerm;
+        if (getState() == State::Leader) return;
+        votesnum = 1; ++currentTerm;
+        votedFor = local_address;
         for (const auto & i : pImpl->stubs) {
             grpc::ClientContext ctx;
             rpc::RequestVote request;
@@ -329,16 +339,76 @@ namespace raft {
             request.set_lastlogterm(get_lastlogterm());
             request.set_lastlogindex(get_lastlogindex());
             i->RequestV(&ctx, request, &reply);
-            if (DEBUG) {std::cerr << std::setw(20) << local_address << " : sendVoteRequest!"<<std::endl;}
         }
     }
 
     void Server::electionDone() {
-        if (votesnum > clustsize / 2) becomeLeader();
-        else becomeFollower();
+        if (getState() == State::Candidate) {
+            if (votesnum > clustsize / 2) becomeLeader();
+            else becomeFollower();
+        }
     }
 
     void Server::heartBeat() {
+        int tmp = 0;
+        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : Start to send HeartBeat!" << std::endl;}
+        for (const auto & i : pImpl->stubs) {
+            grpc::ClientContext ctx;
+            rpc::RequestAppendEntries request;
+            rpc::Reply reply;
+            request.set_term(currentTerm);
+            request.set_leaderid(local_address);
+            request.set_prevlogterm(get_lastlogterm());
+            request.set_prevlogindex(get_lastlogindex());
+            for (uint32_t j = nextIndex[tmp]; j < log.size(); ++j) {
+                rpc::Entry *p = request.add_entries();
+                p->set_term(log[j].term);
+                p->set_key(log[j].key);
+                p->set_args(log[j].args);
+            }
+            request.set_leadercommit(commitIndex);
+            i->RequestAE(&ctx, request, &reply);
+            if (DEBUG) {std::cerr << std::setw(20) << local_address << " : send AppendEntriesRequest!"<<std::endl;}
+        }
+    }
+
+    void Server::becomeLeader() {
+        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : become Leader!"<<std::endl;}
+        votedFor.clear();
+        heart.becomeLeader();
+        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : become Leader!2"<<std::endl;}
+        for (auto & i : nextIndex) i = log.size();
+        for (auto & i : matchIndex) i = 0;
+        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : become Leader!3"<<std::endl;}
+        heartBeat();//TODO: Fix runtime error
+        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : become Leader!4"<<std::endl;}
+    }
+
+    void Server::becomeFollower() {
+        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : become Follower!"<<std::endl;}
+        votedFor.clear();
+        heart.becomeFollower();
+    }
+
+    void Server::pushElection() {
+        boost::lock_guard<boost::mutex> lock(mu);
+        votesnum = 1; ++currentTerm;
+        votedFor = local_address;
+        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : Start Election!"<<std::endl;}
+        for (const auto & i : pImpl->stubs) {
+            grpc::ClientContext ctx;
+            rpc::RequestVote request;
+            rpc::Reply reply;
+            request.set_term(currentTerm);
+            request.set_candidateid(local_address);
+            request.set_lastlogterm(get_lastlogterm());
+            request.set_lastlogindex(get_lastlogindex());
+            i->RequestV(&ctx, request, &reply);
+        }
+    }
+
+    void Server::pushHearBeat() {
+        boost::lock_guard<boost::mutex> lock(mu);
         int tmp = 0;
         for (const auto & i : pImpl->stubs) {
             grpc::ClientContext ctx;
@@ -358,39 +428,6 @@ namespace raft {
             i->RequestAE(&ctx, request, &reply);
             if (DEBUG) {std::cerr << std::setw(20) << local_address << " : sendAppendEntriesRequest!"<<std::endl;}
         }
-    }
-
-    void Server::becomeLeader() {
-        heart.becomeLeader();
-        for (auto & i : nextIndex) i = log.size();
-        for (auto & i : matchIndex) i = 0;
-        heartBeat();
-    }
-
-    void Server::becomeFollower() {
-        heart.becomeFollower();
-    }
-
-    void Server::becomeCandidate() {
-        heart.becomeCandidate();
-    }
-
-    void Server::pushElection() {
-        boost::lock_guard<boost::mutex> lock(mu);
-        q.push(event(EventType::Election));
-        cv.notify_one();
-    }
-
-    void Server::pushElectionDone() {
-        boost::lock_guard<boost::mutex> lock(mu);
-        q.push(event(EventType::ElectionDone));
-        cv.notify_one();
-    }
-
-    void Server::pushHearBeat() {
-        boost::lock_guard<boost::mutex> lock(mu);
-        q.push(event(EventType::HeartBeat));
-        cv.notify_one();
     }
 
     Server::LogEntry::LogEntry(uint64_t _term, uint64_t _index, const std::string &_key, const std::string &_args)

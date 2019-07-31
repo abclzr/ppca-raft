@@ -19,8 +19,11 @@ int main() {
     std::cout << "Sleep Over." << std::endl;
 
     client.Stop();
+    std::cout << "Finish Client" << std::endl;
     server1.Stop();
+    std::cout << "Finish Server1" << std::endl;
     server2.Stop();
+    std::cout << "Finish Server2" << std::endl;
 
     return 0;
 }

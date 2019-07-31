@@ -48,7 +48,6 @@ namespace raft {
         void replyAE(const rpc::ReplyAppendEntries *request, rpc::Reply *reply);
         void replyV(const rpc::ReplyVote *request, rpc::Reply *reply);
         void pushElection();
-        void pushElectionDone();
         void pushHearBeat();
 
         //event_queue
@@ -59,7 +58,7 @@ namespace raft {
 
         //process event
         void election();
-        void electionDone();
+        void electionDone();//ban
         void heartBeat();
         void AppendEntries(const event::RequestAppendEntries *p);
         void Vote(const event::RequestVote *p);
@@ -70,7 +69,6 @@ namespace raft {
 
         //pass message to HeartBeatController
         void becomeLeader();
-        void becomeCandidate();
         void becomeFollower();
 
     public:

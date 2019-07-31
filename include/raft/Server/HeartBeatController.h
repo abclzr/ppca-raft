@@ -10,6 +10,7 @@
 #include <boost/thread.hpp>
 #include <boost/chrono.hpp>
 #include <algorithm>
+#include <iostream>
 
 namespace raft {
 
@@ -17,8 +18,6 @@ namespace raft {
     public:
         template<class Func>
         void bindElection(Func &&f) { election = std::forward<Func>(f); }
-        template<class Func>
-        void bindElectionDone(Func &&f) { electionDone = std::forward<Func>(f); }
         template<class Func>
         void bindHeartBeat(Func &&f) { heartBeat = std::forward<Func>(f); }
 
@@ -31,11 +30,9 @@ namespace raft {
         void Stop();
 
         void becomeLeader();
-        void becomeCandidate();
         void becomeFollower();
 
         std::function<void()> election;
-        std::function<void()> electionDone;
         std::function<void()> heartBeat;
 
         boost::thread th;
