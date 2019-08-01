@@ -15,7 +15,8 @@ int main() {
     server1.Run();
     server2.Run();
 
-    sleep(10);
+    sleep(20);
+
     std::cout << "Sleep Over." << std::endl;
 
     client.Stop();

@@ -47,10 +47,6 @@ raft::event::ReplyVote::ReplyVote(const raft::rpc::ReplyVote *p) {
 
 raft::event::event(raft::EventType t) : type(t) {
     switch (type) {
-        case EventType::Election:
-            break;
-        case EventType::ElectionDone:
-            break;
         case EventType::HeartBeat:
             break;
         case EventType::RequestAppendEntries:
@@ -103,12 +99,6 @@ std::string raft::event::print() const {
     ans.clear();
 
     switch (type) {
-        case EventType::Election:
-            ans += "Election: ";
-            break;
-        case EventType::ElectionDone:
-            ans += "ElectionDone: ";
-            break;
         case EventType::HeartBeat:
             ans += "HeartBeat: ";
             break;

@@ -13,8 +13,8 @@ namespace raft {
 
     const bool DEBUG = true;
     const uint64_t HEARTBEAT_TIME_OUT = 300;
-    const uint64_t ELECTION_TIME_OUT_DOWN = 3000;
-    const uint64_t ELECTION_TIME_OUT_UP = 5000;
+    const uint64_t ELECTION_TIME_OUT_DOWN = 5000;
+    const uint64_t ELECTION_TIME_OUT_UP = 10000;
 
 }
 

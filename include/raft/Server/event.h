@@ -14,7 +14,7 @@
 
 namespace raft {
 
-    enum EventType{Election, ElectionDone, HeartBeat, RequestAppendEntries, RequestVote,
+    enum EventType{HeartBeat, RequestAppendEntries, RequestVote,
             Put, Get, ReplyAppendEntries, ReplyVote};
 
     class event {

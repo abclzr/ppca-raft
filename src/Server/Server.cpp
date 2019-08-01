@@ -46,7 +46,6 @@ namespace raft {
 
         heart.bindElection([this](){pushElection();});
         heart.bindHeartBeat([this](){pushHearBeat();});
-        heart.Run();
     }
 
     void Server::RunExternal() {
@@ -91,7 +90,7 @@ namespace raft {
         if (DEBUG) std::cout << std::setw(20) << local_address << " : Start Process" << std::endl;
         while (!work_is_done) {
             boost::unique_lock<boost::mutex> lock(mu);
-            cv.wait(lock, [this]{return !q.empty();});
+            cv.wait(lock);
             while (!q.empty()) {
                 processEvent(q.front());
                 q.pop();
@@ -100,6 +99,7 @@ namespace raft {
     }
 
     void Server::Run() {
+        st = clock();
         boost::function0<void> f1 = boost::bind(&Server::RunExternal, this);
         boost::function0<void> f2 = boost::bind(&Server::RunRaft, this);
         boost::function0<void> f3 = boost::bind(&Server::RunProcess, this);
@@ -134,14 +134,8 @@ namespace raft {
     }
 
     void Server::processEvent(const event &e) {
-        if (DEBUG) {std::cerr << std::setw(20) << local_address << " received: " << e.print()<<std::endl;}
+        if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " received: " << e.print()<<std::endl;}
         switch (e.type) {
-            case EventType::Election:
-                election();
-                break;
-            case EventType::ElectionDone:
-                electionDone();
-                break;
             case EventType::HeartBeat:
                 heartBeat();
                 break;
@@ -185,7 +179,7 @@ namespace raft {
     }
 
     void Server::requestV(const rpc::RequestVote *request, rpc::Reply *reply) {
-        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : rpc receive requestVote ! " <<std::endl;}
+        if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : rpc receive requestVote ! " <<std::endl;}
         boost::lock_guard<boost::mutex> lock(mu);
         q.push(event(request));
         cv.notify_one();
@@ -198,7 +192,7 @@ namespace raft {
     }
 
     void Server::replyV(const rpc::ReplyVote *request, rpc::Reply *reply) {
-        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : rpc receive Vote ! " <<std::endl;}
+        if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : rpc receive Vote ! " <<std::endl;}
         boost::lock_guard<boost::mutex> lock(mu);
         q.push(event(request));
         cv.notify_one();
@@ -245,9 +239,8 @@ namespace raft {
         grpc::ClientContext ctx;
         rpc::ReplyVote reply;
         rpc::Reply rp;
+        if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : Start Vote!" << std::endl;}
 
-        if (getState() == State::Follower)
-            becomeFollower();
         reply.set_followerid(local_address);
         reply.set_term(currentTerm);
         if (p->term < currentTerm) reply.set_ans(false);
@@ -262,10 +255,12 @@ namespace raft {
             reply.set_ans(true);
         } else
             reply.set_ans(false);
+        if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : Start Vote2!" << std::endl;}
 
         if (p->term > currentTerm) currentTerm = p->term;
-        pImpl->stubs[getServer[p->candidateID]]->ReplyV(&ctx, reply, &rp);
-        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : Vote Successfully " <<reply.ans()<<std::endl;}
+        grpc::Status rr;
+        rr = pImpl->stubs[getServer[p->candidateID]]->ReplyV(&ctx, reply, &rp);
+        if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : Vote Successfully " << reply.ans() << " Status: " << rr.ok() << std::endl;}
     }
 
     void Server::replyAppendEntries(const event::ReplyAppendEntries *p) {
@@ -326,32 +321,9 @@ namespace raft {
         return heart.state;
     }
 
-    void Server::election() {
-        if (getState() == State::Leader) return;
-        votesnum = 1; ++currentTerm;
-        votedFor = local_address;
-        for (const auto & i : pImpl->stubs) {
-            grpc::ClientContext ctx;
-            rpc::RequestVote request;
-            rpc::Reply reply;
-            request.set_term(currentTerm);
-            request.set_candidateid(local_address);
-            request.set_lastlogterm(get_lastlogterm());
-            request.set_lastlogindex(get_lastlogindex());
-            i->RequestV(&ctx, request, &reply);
-        }
-    }
-
-    void Server::electionDone() {
-        if (getState() == State::Candidate) {
-            if (votesnum > clustsize / 2) becomeLeader();
-            else becomeFollower();
-        }
-    }
-
     void Server::heartBeat() {
         int tmp = 0;
-        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : Start to send HeartBeat!" << std::endl;}
+        if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : Start to send HeartBeat!" << std::endl;}
         for (const auto & i : pImpl->stubs) {
             grpc::ClientContext ctx;
             rpc::RequestAppendEntries request;
@@ -367,25 +339,23 @@ namespace raft {
                 p->set_args(log[j].args);
             }
             request.set_leadercommit(commitIndex);
+            if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : Start to send HeartBeat! 2" << std::endl;}
             i->RequestAE(&ctx, request, &reply);
-            if (DEBUG) {std::cerr << std::setw(20) << local_address << " : send AppendEntriesRequest!"<<std::endl;}
+            if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : send AppendEntriesRequest!"<<std::endl;}
         }
     }
 
     void Server::becomeLeader() {
-        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : become Leader!"<<std::endl;}
+        if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : become Leader!"<<std::endl;}
         votedFor.clear();
         heart.becomeLeader();
-        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : become Leader!2"<<std::endl;}
         for (auto & i : nextIndex) i = log.size();
         for (auto & i : matchIndex) i = 0;
-        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : become Leader!3"<<std::endl;}
         heartBeat();//TODO: Fix runtime error
-        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : become Leader!4"<<std::endl;}
     }
 
     void Server::becomeFollower() {
-        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : become Follower!"<<std::endl;}
+        if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : become Follower!"<<std::endl;}
         votedFor.clear();
         heart.becomeFollower();
     }
@@ -394,7 +364,7 @@ namespace raft {
         boost::lock_guard<boost::mutex> lock(mu);
         votesnum = 1; ++currentTerm;
         votedFor = local_address;
-        if (DEBUG) {std::cerr << std::setw(20) << local_address << " : Start Election!"<<std::endl;}
+        if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : Start Election at " << (double) (clock() - st) / 1000 <<std::endl;}
         for (const auto & i : pImpl->stubs) {
             grpc::ClientContext ctx;
             rpc::RequestVote request;
@@ -403,7 +373,9 @@ namespace raft {
             request.set_candidateid(local_address);
             request.set_lastlogterm(get_lastlogterm());
             request.set_lastlogindex(get_lastlogindex());
-            i->RequestV(&ctx, request, &reply);
+            grpc::Status rr;
+            rr = i->RequestV(&ctx, request, &reply);
+            if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : Send RequestVote Result: " <<  rr.ok() <<std::endl;}
         }
     }
 
@@ -426,7 +398,7 @@ namespace raft {
             }
             request.set_leadercommit(commitIndex);
             i->RequestAE(&ctx, request, &reply);
-            if (DEBUG) {std::cerr << std::setw(20) << local_address << " : sendAppendEntriesRequest!"<<std::endl;}
+            if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : sendAppendEntriesRequest!"<<std::endl;}
         }
     }
 

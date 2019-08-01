@@ -33,6 +33,7 @@ namespace raft {
         uint64_t get_lastlogindex();
         uint64_t get_lastlogterm();
         uint64_t getTerm(uint64_t index);
+        clock_t st;
 
         struct Impl;
         std::unique_ptr<Impl> pImpl;
@@ -57,8 +58,6 @@ namespace raft {
         void processEvent(const event &);
 
         //process event
-        void election();
-        void electionDone();//ban
         void heartBeat();
         void AppendEntries(const event::RequestAppendEntries *p);
         void Vote(const event::RequestVote *p);
