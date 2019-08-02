@@ -12,9 +12,9 @@ namespace raft {
     enum State {Leader, Candidate, Follower};
 
     const bool DEBUG = true;
-    const uint64_t HEARTBEAT_TIME_OUT = 300;
-    const uint64_t ELECTION_TIME_OUT_DOWN = 5000;
-    const uint64_t ELECTION_TIME_OUT_UP = 10000;
+    const uint64_t HEARTBEAT_TIME_OUT = 30;
+    const uint64_t ELECTION_TIME_OUT_DOWN = 500;
+    const uint64_t ELECTION_TIME_OUT_UP = 1000;
 
 }
 

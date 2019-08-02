@@ -34,6 +34,7 @@ namespace raft {
             uint64_t prevLogTerm;
             std::vector<Entry>entries;
             uint64_t leaderCommit;
+            std::string exleaderID;
             explicit RequestAppendEntries(const rpc::RequestAppendEntries *);
         } *RequestAE;
 

@@ -168,6 +168,7 @@ const ::google::protobuf::uint32 TableStruct_raft_2eproto::offsets[] PROTOBUF_SE
   PROTOBUF_FIELD_OFFSET(::raft::rpc::RequestAppendEntries, prevlogterm_),
   PROTOBUF_FIELD_OFFSET(::raft::rpc::RequestAppendEntries, entries_),
   PROTOBUF_FIELD_OFFSET(::raft::rpc::RequestAppendEntries, leadercommit_),
+  PROTOBUF_FIELD_OFFSET(::raft::rpc::RequestAppendEntries, exleaderid_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::raft::rpc::ReplyAppendEntries, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -198,9 +199,9 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 0, -1, sizeof(::raft::rpc::Reply)},
   { 5, -1, sizeof(::raft::rpc::Entry)},
   { 13, -1, sizeof(::raft::rpc::RequestAppendEntries)},
-  { 24, -1, sizeof(::raft::rpc::ReplyAppendEntries)},
-  { 32, -1, sizeof(::raft::rpc::RequestVote)},
-  { 41, -1, sizeof(::raft::rpc::ReplyVote)},
+  { 25, -1, sizeof(::raft::rpc::ReplyAppendEntries)},
+  { 33, -1, sizeof(::raft::rpc::RequestVote)},
+  { 42, -1, sizeof(::raft::rpc::ReplyVote)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -221,27 +222,28 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 const char descriptor_table_protodef_raft_2eproto[] =
   "\n\nraft.proto\022\010raft.rpc\"\007\n\005Reply\"0\n\005Entry"
   "\022\014\n\004term\030\001 \001(\004\022\013\n\003key\030\002 \001(\t\022\014\n\004args\030\003 \001("
-  "\t\"\231\001\n\024RequestAppendEntries\022\014\n\004term\030\001 \001(\004"
+  "\t\"\255\001\n\024RequestAppendEntries\022\014\n\004term\030\001 \001(\004"
   "\022\020\n\010leaderID\030\002 \001(\t\022\024\n\014prevLogIndex\030\003 \001(\004"
   "\022\023\n\013prevLogTerm\030\004 \001(\004\022 \n\007entries\030\005 \003(\0132\017"
-  ".raft.rpc.Entry\022\024\n\014leaderCommit\030\006 \001(\004\"C\n"
-  "\022ReplyAppendEntries\022\014\n\004term\030\001 \001(\004\022\013\n\003ans"
-  "\030\002 \001(\010\022\022\n\nfollowerID\030\003 \001(\t\"[\n\013RequestVot"
-  "e\022\014\n\004term\030\001 \001(\004\022\023\n\013candidateID\030\002 \001(\t\022\024\n\014"
-  "lastLogIndex\030\003 \001(\004\022\023\n\013lastLogTerm\030\004 \001(\004\""
-  ":\n\tReplyVote\022\014\n\004term\030\001 \001(\004\022\013\n\003ans\030\002 \001(\010\022"
-  "\022\n\nfollowerID\030\003 \001(\t2\355\001\n\007RaftRpc\022>\n\tReque"
-  "stAE\022\036.raft.rpc.RequestAppendEntries\032\017.r"
-  "aft.rpc.Reply\"\000\0224\n\010RequestV\022\025.raft.rpc.R"
-  "equestVote\032\017.raft.rpc.Reply\"\000\022:\n\007ReplyAE"
-  "\022\034.raft.rpc.ReplyAppendEntries\032\017.raft.rp"
-  "c.Reply\"\000\0220\n\006ReplyV\022\023.raft.rpc.ReplyVote"
-  "\032\017.raft.rpc.Reply\"\000b\006proto3"
+  ".raft.rpc.Entry\022\024\n\014leaderCommit\030\006 \001(\004\022\022\n"
+  "\nexleaderID\030\007 \001(\t\"C\n\022ReplyAppendEntries\022"
+  "\014\n\004term\030\001 \001(\004\022\013\n\003ans\030\002 \001(\010\022\022\n\nfollowerID"
+  "\030\003 \001(\t\"[\n\013RequestVote\022\014\n\004term\030\001 \001(\004\022\023\n\013c"
+  "andidateID\030\002 \001(\t\022\024\n\014lastLogIndex\030\003 \001(\004\022\023"
+  "\n\013lastLogTerm\030\004 \001(\004\":\n\tReplyVote\022\014\n\004term"
+  "\030\001 \001(\004\022\013\n\003ans\030\002 \001(\010\022\022\n\nfollowerID\030\003 \001(\t2"
+  "\355\001\n\007RaftRpc\022>\n\tRequestAE\022\036.raft.rpc.Requ"
+  "estAppendEntries\032\017.raft.rpc.Reply\"\000\0224\n\010R"
+  "equestV\022\025.raft.rpc.RequestVote\032\017.raft.rp"
+  "c.Reply\"\000\022:\n\007ReplyAE\022\034.raft.rpc.ReplyApp"
+  "endEntries\032\017.raft.rpc.Reply\"\000\0220\n\006ReplyV\022"
+  "\023.raft.rpc.ReplyVote\032\017.raft.rpc.Reply\"\000b"
+  "\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_raft_2eproto = {
   false, InitDefaults_raft_2eproto, 
   descriptor_table_protodef_raft_2eproto,
-  "raft.proto", &assign_descriptors_table_raft_2eproto, 707,
+  "raft.proto", &assign_descriptors_table_raft_2eproto, 727,
 };
 
 void AddDescriptors_raft_2eproto() {
@@ -895,6 +897,7 @@ const int RequestAppendEntries::kPrevLogIndexFieldNumber;
 const int RequestAppendEntries::kPrevLogTermFieldNumber;
 const int RequestAppendEntries::kEntriesFieldNumber;
 const int RequestAppendEntries::kLeaderCommitFieldNumber;
+const int RequestAppendEntries::kExleaderIDFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 RequestAppendEntries::RequestAppendEntries()
@@ -911,6 +914,10 @@ RequestAppendEntries::RequestAppendEntries(const RequestAppendEntries& from)
   if (from.leaderid().size() > 0) {
     leaderid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.leaderid_);
   }
+  exleaderid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.exleaderid().size() > 0) {
+    exleaderid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.exleaderid_);
+  }
   ::memcpy(&term_, &from.term_,
     static_cast<size_t>(reinterpret_cast<char*>(&leadercommit_) -
     reinterpret_cast<char*>(&term_)) + sizeof(leadercommit_));
@@ -921,6 +928,7 @@ void RequestAppendEntries::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_RequestAppendEntries_raft_2eproto.base);
   leaderid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  exleaderid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&term_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&leadercommit_) -
       reinterpret_cast<char*>(&term_)) + sizeof(leadercommit_));
@@ -933,6 +941,7 @@ RequestAppendEntries::~RequestAppendEntries() {
 
 void RequestAppendEntries::SharedDtor() {
   leaderid_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  exleaderid_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 void RequestAppendEntries::SetCachedSize(int size) const {
@@ -952,6 +961,7 @@ void RequestAppendEntries::Clear() {
 
   entries_.Clear();
   leaderid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  exleaderid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&term_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&leadercommit_) -
       reinterpret_cast<char*>(&term_)) + sizeof(leadercommit_));
@@ -1029,6 +1039,22 @@ const char* RequestAppendEntries::_InternalParse(const char* begin, const char* 
         if (static_cast<::google::protobuf::uint8>(tag) != 48) goto handle_unusual;
         msg->set_leadercommit(::google::protobuf::internal::ReadVarint(&ptr));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // string exleaderID = 7;
+      case 7: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 58) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("raft.rpc.RequestAppendEntries.exleaderID");
+        object = msg->mutable_exleaderid();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
         break;
       }
       default: {
@@ -1143,6 +1169,21 @@ bool RequestAppendEntries::MergePartialFromCodedStream(
         break;
       }
 
+      // string exleaderID = 7;
+      case 7: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (58 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_exleaderid()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->exleaderid().data(), static_cast<int>(this->exleaderid().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "raft.rpc.RequestAppendEntries.exleaderID"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -1209,6 +1250,16 @@ void RequestAppendEntries::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteUInt64(6, this->leadercommit(), output);
   }
 
+  // string exleaderID = 7;
+  if (this->exleaderid().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->exleaderid().data(), static_cast<int>(this->exleaderid().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "raft.rpc.RequestAppendEntries.exleaderID");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      7, this->exleaderid(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -1261,6 +1312,17 @@ void RequestAppendEntries::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(6, this->leadercommit(), target);
   }
 
+  // string exleaderID = 7;
+  if (this->exleaderid().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->exleaderid().data(), static_cast<int>(this->exleaderid().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "raft.rpc.RequestAppendEntries.exleaderID");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        7, this->exleaderid(), target);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -1298,6 +1360,13 @@ size_t RequestAppendEntries::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
         this->leaderid());
+  }
+
+  // string exleaderID = 7;
+  if (this->exleaderid().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->exleaderid());
   }
 
   // uint64 term = 1;
@@ -1360,6 +1429,10 @@ void RequestAppendEntries::MergeFrom(const RequestAppendEntries& from) {
 
     leaderid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.leaderid_);
   }
+  if (from.exleaderid().size() > 0) {
+
+    exleaderid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.exleaderid_);
+  }
   if (from.term() != 0) {
     set_term(from.term());
   }
@@ -1401,6 +1474,8 @@ void RequestAppendEntries::InternalSwap(RequestAppendEntries* other) {
   _internal_metadata_.Swap(&other->_internal_metadata_);
   CastToBase(&entries_)->InternalSwap(CastToBase(&other->entries_));
   leaderid_.Swap(&other->leaderid_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  exleaderid_.Swap(&other->exleaderid_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(term_, other->term_);
   swap(prevlogindex_, other->prevlogindex_);

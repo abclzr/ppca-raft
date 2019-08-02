@@ -15,6 +15,7 @@ raft::event::RequestAppendEntries::RequestAppendEntries(const raft::rpc::Request
     for (const auto & i : p->entries())
         entries.emplace_back(Entry(i.term(), i.key(), i.args()));
     leaderCommit = p->leadercommit();
+    exleaderID = p->exleaderid();
 }
 
 raft::event::RequestVote::RequestVote(const raft::rpc::RequestVote *p) {

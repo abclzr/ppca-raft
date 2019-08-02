@@ -453,6 +453,20 @@ class RequestAppendEntries final :
   ::std::string* release_leaderid();
   void set_allocated_leaderid(::std::string* leaderid);
 
+  // string exleaderID = 7;
+  void clear_exleaderid();
+  static const int kExleaderIDFieldNumber = 7;
+  const ::std::string& exleaderid() const;
+  void set_exleaderid(const ::std::string& value);
+  #if LANG_CXX11
+  void set_exleaderid(::std::string&& value);
+  #endif
+  void set_exleaderid(const char* value);
+  void set_exleaderid(const char* value, size_t size);
+  ::std::string* mutable_exleaderid();
+  ::std::string* release_exleaderid();
+  void set_allocated_exleaderid(::std::string* exleaderid);
+
   // uint64 term = 1;
   void clear_term();
   static const int kTermFieldNumber = 1;
@@ -484,6 +498,7 @@ class RequestAppendEntries final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField< ::raft::rpc::Entry > entries_;
   ::google::protobuf::internal::ArenaStringPtr leaderid_;
+  ::google::protobuf::internal::ArenaStringPtr exleaderid_;
   ::google::protobuf::uint64 term_;
   ::google::protobuf::uint64 prevlogindex_;
   ::google::protobuf::uint64 prevlogterm_;
@@ -1176,6 +1191,59 @@ inline void RequestAppendEntries::set_leadercommit(::google::protobuf::uint64 va
   
   leadercommit_ = value;
   // @@protoc_insertion_point(field_set:raft.rpc.RequestAppendEntries.leaderCommit)
+}
+
+// string exleaderID = 7;
+inline void RequestAppendEntries::clear_exleaderid() {
+  exleaderid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& RequestAppendEntries::exleaderid() const {
+  // @@protoc_insertion_point(field_get:raft.rpc.RequestAppendEntries.exleaderID)
+  return exleaderid_.GetNoArena();
+}
+inline void RequestAppendEntries::set_exleaderid(const ::std::string& value) {
+  
+  exleaderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:raft.rpc.RequestAppendEntries.exleaderID)
+}
+#if LANG_CXX11
+inline void RequestAppendEntries::set_exleaderid(::std::string&& value) {
+  
+  exleaderid_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:raft.rpc.RequestAppendEntries.exleaderID)
+}
+#endif
+inline void RequestAppendEntries::set_exleaderid(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  exleaderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:raft.rpc.RequestAppendEntries.exleaderID)
+}
+inline void RequestAppendEntries::set_exleaderid(const char* value, size_t size) {
+  
+  exleaderid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:raft.rpc.RequestAppendEntries.exleaderID)
+}
+inline ::std::string* RequestAppendEntries::mutable_exleaderid() {
+  
+  // @@protoc_insertion_point(field_mutable:raft.rpc.RequestAppendEntries.exleaderID)
+  return exleaderid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* RequestAppendEntries::release_exleaderid() {
+  // @@protoc_insertion_point(field_release:raft.rpc.RequestAppendEntries.exleaderID)
+  
+  return exleaderid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void RequestAppendEntries::set_allocated_exleaderid(::std::string* exleaderid) {
+  if (exleaderid != nullptr) {
+    
+  } else {
+    
+  }
+  exleaderid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), exleaderid);
+  // @@protoc_insertion_point(field_set_allocated:raft.rpc.RequestAppendEntries.exleaderID)
 }
 
 // -------------------------------------------------------------------

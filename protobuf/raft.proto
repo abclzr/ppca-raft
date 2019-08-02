@@ -21,6 +21,7 @@ message RequestAppendEntries
     uint64 prevLogTerm = 4;
     repeated Entry entries = 5;
     uint64 leaderCommit = 6;
+    string exleaderID = 7;
 }
 
 message ReplyAppendEntries

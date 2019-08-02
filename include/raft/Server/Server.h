@@ -73,13 +73,14 @@ namespace raft {
         void becomeFollower();
 
     public:
-        Server(const std::string &, uint64_t, const std::string &);
+        Server(const std::string &);
         void RunExternal();
         void RunRaft();
         void RunProcess();
         //start the server
         void Run();
         void Stop();
+        void WriteLog(std::ostream &os);
         ~Server();
 
         boost::thread t1;
@@ -93,6 +94,7 @@ namespace raft {
         uint64_t votesnum;
         uint64_t clustsize;
         std::string leaderAddress;
+        std::string exLeaderAddress;
 
         uint64_t currentTerm;
         std::string votedFor;

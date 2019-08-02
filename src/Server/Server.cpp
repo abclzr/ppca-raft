@@ -12,7 +12,7 @@ namespace raft {
         std::atomic<std::size_t> cur{0};
     };
 
-    Server::Server(const std::string &filename, uint64_t _clustnum, const std::string &Clientaddr) : pImpl(std::make_unique<Impl>()) {
+    Server::Server(const std::string &filename) : pImpl(std::make_unique<Impl>()) {
         namespace pt = boost::property_tree;
         pt::ptree tree;
         pt::read_json(filename, tree);
@@ -28,12 +28,18 @@ namespace raft {
         for (auto &&srv : tree.get_child("externalServerList"))
             if (srv.second.get_value<std::string>() != external_local_address)
                 exSrvList.emplace_back(srv.second.get_value<std::string>());
+        for (auto &&clt : tree.get_child("clientList"))
+            pImpl->clientStubs.emplace_back(external::External::NewStub((grpc::CreateChannel(
+                clt.second.get_value<std::string>(), grpc::InsecureChannelCredentials()))));
 
+        clustsize = srvList.size();
         uint32_t cnt = 0;
         for (const auto &srv : srvList) {
             pImpl->stubs.emplace_back(rpc::RaftRpc::NewStub(grpc::CreateChannel(
                     srv, grpc::InsecureChannelCredentials())));
             getServer[srv] = cnt++;
+            nextIndex.emplace_back();
+            matchIndex.emplace_back();
         }
 
         cnt = 0;
@@ -43,16 +49,11 @@ namespace raft {
             getExServer[srv] = cnt++;
         }
 
-        if (!Clientaddr.empty())
-            pImpl->clientStubs.emplace_back(external::External::NewStub((grpc::CreateChannel(
-                    Clientaddr, grpc::InsecureChannelCredentials()))));
-
-        clustsize = _clustnum;
         currentTerm = 0;
         lastApplied = 0;
         commitIndex = 0;
         work_is_done = false;
-        log.emplace_back(0, 0, "", "");
+        log.emplace_back(0, 0, "abclzrStartKey", "abclzrStartValue");
 
         heart.bindElection([this](){pushElection();});
         heart.bindHeartBeat([this](){pushHearBeat();});
@@ -103,7 +104,10 @@ namespace raft {
             boost::unique_lock<boost::mutex> lock(mu);
             cv.wait(lock);
             while (!q.empty()) {
-                processEvent(q.front());
+                event e = q.front();
+                lock.unlock();
+                processEvent(e);
+                lock.lock();
                 q.pop();
             }
         }
@@ -190,7 +194,6 @@ namespace raft {
     }
 
     void Server::requestV(const rpc::RequestVote *request, rpc::Reply *reply) {
-        if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : rpc receive requestVote ! " <<std::endl;}
         boost::lock_guard<boost::mutex> lock(mu);
         q.push(event(request));
         cv.notify_one();
@@ -203,7 +206,6 @@ namespace raft {
     }
 
     void Server::replyV(const rpc::ReplyVote *request, rpc::Reply *reply) {
-        if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : rpc receive Vote ! " <<std::endl;}
         boost::lock_guard<boost::mutex> lock(mu);
         q.push(event(request));
         cv.notify_one();
@@ -223,9 +225,11 @@ namespace raft {
                     becomeFollower();
                 }
             }
-        }
+        } else
+            becomeFollower();
         votedFor.clear();
         leaderAddress = p->leaderID;
+        exLeaderAddress = p->exleaderID;
         reply.set_followerid(local_address);
         reply.set_term(currentTerm);
         if (p->term < currentTerm) reply.set_ans(false);
@@ -242,7 +246,6 @@ namespace raft {
 
         if (p->term > currentTerm) currentTerm = p->term;
         if (p->leaderCommit > commitIndex) commitIndex = std::min(p->leaderCommit, log.size() - 1);
-
         pImpl->stubs[getServer[p->leaderID]]->ReplyAE(&ctx, reply, &rp);
     }
 
@@ -250,7 +253,6 @@ namespace raft {
         grpc::ClientContext ctx;
         rpc::ReplyVote reply;
         rpc::Reply rp;
-        if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : Start Vote!" << std::endl;}
 
         reply.set_followerid(local_address);
         reply.set_term(currentTerm);
@@ -300,7 +302,9 @@ namespace raft {
             grpc::ClientContext ctx;
             external::PutRequest request;
             external::Reply reply;
-            pImpl->redirectStubs[getServer[leaderAddress]]->Put(&ctx, request, &reply);
+            request.set_key(p->key);
+            request.set_value(p->value);
+            pImpl->redirectStubs[getExServer[exLeaderAddress]]->Put(&ctx, request, &reply);
         }
     }
 
@@ -316,7 +320,8 @@ namespace raft {
             grpc::ClientContext ctx;
             external::GetRequest request;
             external::Reply reply;
-            pImpl->redirectStubs[getServer[leaderAddress]]->Get(&ctx, request, &reply);
+            request.set_key(p->key);
+            pImpl->redirectStubs[getExServer[exLeaderAddress]]->Get(&ctx, request, &reply);
         }
     }
 
@@ -331,15 +336,15 @@ namespace raft {
 
     void Server::heartBeat() {
         int tmp = 0;
-        if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : Start to send HeartBeat!" << std::endl;}
         for (const auto & i : pImpl->stubs) {
             grpc::ClientContext ctx;
             rpc::RequestAppendEntries request;
             rpc::Reply reply;
             request.set_term(currentTerm);
             request.set_leaderid(local_address);
-            request.set_prevlogterm(get_lastlogterm());
-            request.set_prevlogindex(get_lastlogindex());
+            request.set_exleaderid(external_local_address);
+            request.set_prevlogterm(getTerm(nextIndex[tmp] - 1));
+            request.set_prevlogindex(nextIndex[tmp] - 1);
             for (uint32_t j = nextIndex[tmp]; j < log.size(); ++j) {
                 rpc::Entry *p = request.add_entries();
                 p->set_term(log[j].term);
@@ -347,9 +352,8 @@ namespace raft {
                 p->set_args(log[j].args);
             }
             request.set_leadercommit(commitIndex);
-            if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : Start to send HeartBeat! 2" << std::endl;}
             i->RequestAE(&ctx, request, &reply);
-            if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : send AppendEntriesRequest!"<<std::endl;}
+            ++tmp;
         }
     }
 
@@ -363,7 +367,6 @@ namespace raft {
     }
 
     void Server::becomeFollower() {
-        if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : become Follower!"<<std::endl;}
         votedFor.clear();
         heart.becomeFollower();
     }
@@ -372,7 +375,6 @@ namespace raft {
         boost::lock_guard<boost::mutex> lock(mu);
         votesnum = 1; ++currentTerm;
         votedFor = local_address;
-        if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : Start Election at " << (double) (clock() - st) / 1000 <<std::endl;}
         for (const auto & i : pImpl->stubs) {
             grpc::ClientContext ctx;
             rpc::RequestVote request;
@@ -383,13 +385,20 @@ namespace raft {
             request.set_lastlogindex(get_lastlogindex());
             grpc::Status rr;
             rr = i->RequestV(&ctx, request, &reply);
-            if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : Send RequestVote Result: " <<  rr.ok() <<std::endl;}
         }
     }
 
     void Server::pushHearBeat() {
         boost::lock_guard<boost::mutex> lock(mu);
         heartBeat();
+    }
+
+    void Server::WriteLog(std::ostream &os) {
+        os << local_address << " Log : contains " << log.size() << (log.size() == 1 ? " item" : " items") << std::endl;
+        for (int i = 1; i <= 55; ++i) os << '-'; os << std::endl;
+        os << "|index| term|        key         |        value       |" << std::endl;
+        for (int i = 1; i <= 55; ++i) os << '-'; os << std::endl;
+        //TODO: add log framwork
     }
 
     Server::LogEntry::LogEntry(uint64_t _term, uint64_t _index, const std::string &_key, const std::string &_args)
