@@ -8,7 +8,7 @@ int main() {
     std::ios::sync_with_stdio(false);
     std::cout << "Hello, world!" << std::endl;
     raft::Client client(std::string(CMAKE_SOURCE_DIR) + "/cmake-build-debug/example/RaftConfig0.json");
-    raft::Server server1(std::string(CMAKE_SOURCE_DIR) + "/cmake-build-debug/example/RaftConfig1.json", 2, "");
+    raft::Server server1(std::string(CMAKE_SOURCE_DIR) + "/cmake-build-debug/example/RaftConfig1.json", 2, client.local_address);
     raft::Server server2(std::string(CMAKE_SOURCE_DIR) + "/cmake-build-debug/example/RaftConfig2.json", 2, "");
 
     client.Run();

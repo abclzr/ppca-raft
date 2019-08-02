@@ -17,20 +17,30 @@ namespace raft {
         pt::ptree tree;
         pt::read_json(filename, tree);
 
-        for (auto &&srv : tree.get_child("local"))
-            local_address = srv.second.get_value<std::string>();
+        local_address = tree.get_child("local.address").get_value<std::string>();
+        external_local_address = tree.get_child("local.externalAddress").get_value<std::string>();
+
         std::vector<std::string> srvList;
+        std::vector<std::string> exSrvList;
         for (auto &&srv : tree.get_child("serverList"))
             if (srv.second.get_value<std::string>() != local_address)
                 srvList.emplace_back(srv.second.get_value<std::string>());
+        for (auto &&srv : tree.get_child("externalServerList"))
+            if (srv.second.get_value<std::string>() != external_local_address)
+                exSrvList.emplace_back(srv.second.get_value<std::string>());
 
         uint32_t cnt = 0;
         for (const auto &srv : srvList) {
-            pImpl->redirectStubs.emplace_back(external::External::NewStub(grpc::CreateChannel(
-                    srv, grpc::InsecureChannelCredentials())));
             pImpl->stubs.emplace_back(rpc::RaftRpc::NewStub(grpc::CreateChannel(
                     srv, grpc::InsecureChannelCredentials())));
             getServer[srv] = cnt++;
+        }
+
+        cnt = 0;
+        for (const auto &srv : exSrvList) {
+            pImpl->redirectStubs.emplace_back(external::External::NewStub(grpc::CreateChannel(
+                    srv, grpc::InsecureChannelCredentials())));
+            getExServer[srv] = cnt++;
         }
 
         if (!Clientaddr.empty())
@@ -46,6 +56,7 @@ namespace raft {
 
         heart.bindElection([this](){pushElection();});
         heart.bindHeartBeat([this](){pushHearBeat();});
+        if (DEBUG) std::cerr << std::setw(20) << local_address<< " : Finish Construction!" << std::endl;
     }
 
     void Server::RunExternal() {
@@ -57,10 +68,10 @@ namespace raft {
             get(request, response);
         });
         grpc::ServerBuilder builder;
-        builder.AddListeningPort(local_address, grpc::InsecureServerCredentials());
+        builder.AddListeningPort(external_local_address, grpc::InsecureServerCredentials());
         builder.RegisterService(&service);
         serverExternal = builder.BuildAndStart();
-        if (DEBUG) std::cout << std::setw(20) << local_address << " : Start External" << std::endl;
+        if (DEBUG) std::cout << std::setw(20) << external_local_address << " : Start External" << std::endl;
         serverExternal->Wait();
     }
 
@@ -255,12 +266,9 @@ namespace raft {
             reply.set_ans(true);
         } else
             reply.set_ans(false);
-        if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : Start Vote2!" << std::endl;}
-
         if (p->term > currentTerm) currentTerm = p->term;
         grpc::Status rr;
         rr = pImpl->stubs[getServer[p->candidateID]]->ReplyV(&ctx, reply, &rp);
-        if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : Vote Successfully " << reply.ans() << " Status: " << rr.ok() << std::endl;}
     }
 
     void Server::replyAppendEntries(const event::ReplyAppendEntries *p) {
@@ -381,25 +389,7 @@ namespace raft {
 
     void Server::pushHearBeat() {
         boost::lock_guard<boost::mutex> lock(mu);
-        int tmp = 0;
-        for (const auto & i : pImpl->stubs) {
-            grpc::ClientContext ctx;
-            rpc::RequestAppendEntries request;
-            rpc::Reply reply;
-            request.set_term(currentTerm);
-            request.set_leaderid(local_address);
-            request.set_prevlogterm(get_lastlogterm());
-            request.set_prevlogindex(get_lastlogindex());
-            for (uint32_t j = nextIndex[tmp]; j < log.size(); ++j) {
-                rpc::Entry *p = request.add_entries();
-                p->set_term(log[j].term);
-                p->set_key(log[j].key);
-                p->set_args(log[j].args);
-            }
-            request.set_leadercommit(commitIndex);
-            i->RequestAE(&ctx, request, &reply);
-            if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : sendAppendEntriesRequest!"<<std::endl;}
-        }
+        heartBeat();
     }
 
     Server::LogEntry::LogEntry(uint64_t _term, uint64_t _index, const std::string &_key, const std::string &_args)

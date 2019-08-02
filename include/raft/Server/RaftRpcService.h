@@ -7,7 +7,7 @@
 
 #include <functional>
 #include <thread>
-
+#include "config.h"
 #include <grpc++/server.h>
 #include <grpc++/server_builder.h>
 

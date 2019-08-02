@@ -31,7 +31,7 @@ Client::Client(const std::string &filename) : pImpl(std::make_unique<Impl>()) {
     for (auto &&srv : tree.get_child("local"))
         local_address = srv.second.get_value<std::string>();
   std::vector<std::string> srvList;
-  for (auto &&srv : tree.get_child("serverList"))
+  for (auto &&srv : tree.get_child("externalServerList"))
     srvList.emplace_back(srv.second.get_value<std::string>());
 
   for (const auto & srv : srvList) {

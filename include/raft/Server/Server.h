@@ -29,6 +29,7 @@ namespace raft {
     private:
         std::map<std::string, std::string> table;
         std::map<std::string, uint32_t> getServer;
+        std::map<std::string, uint32_t> getExServer;
         State getState();
         uint64_t get_lastlogindex();
         uint64_t get_lastlogterm();
@@ -38,6 +39,7 @@ namespace raft {
         struct Impl;
         std::unique_ptr<Impl> pImpl;
         std::string local_address;
+        std::string external_local_address;
 
         //communicate with client as a leader
         void put(const external::PutRequest *request, external::Reply *response);
