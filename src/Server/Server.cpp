@@ -215,6 +215,9 @@ namespace raft {
         grpc::ClientContext ctx;
         rpc::ReplyAppendEntries reply;
         rpc::Reply rp;
+        auto startTimePoint = std::chrono::system_clock::now();
+        ctx.set_deadline(startTimePoint + std::chrono::milliseconds(300));
+        ctx.set_idempotent(true);
 
         if (getState() != State::Follower) {
             if (getState() == State::Candidate) {
@@ -253,6 +256,9 @@ namespace raft {
         grpc::ClientContext ctx;
         rpc::ReplyVote reply;
         rpc::Reply rp;
+        auto startTimePoint = std::chrono::system_clock::now();
+        ctx.set_deadline(startTimePoint + std::chrono::milliseconds(300));
+        ctx.set_idempotent(true);
 
         reply.set_followerid(local_address);
         reply.set_term(currentTerm);
@@ -296,12 +302,18 @@ namespace raft {
             grpc::ClientContext ctx;
             external::PutReply reply;
             external::Reply rp;
+            auto startTimePoint = std::chrono::system_clock::now();
+            ctx.set_deadline(startTimePoint + std::chrono::milliseconds(300));
+            ctx.set_idempotent(true);
             reply.set_status(true);
             pImpl->clientStubs[0]->ReplyPut(&ctx, reply, &rp);
         } else {
             grpc::ClientContext ctx;
             external::PutRequest request;
             external::Reply reply;
+            auto startTimePoint = std::chrono::system_clock::now();
+            ctx.set_deadline(startTimePoint + std::chrono::milliseconds(300));
+            ctx.set_idempotent(true);
             request.set_key(p->key);
             request.set_value(p->value);
             pImpl->redirectStubs[getExServer[exLeaderAddress]]->Put(&ctx, request, &reply);
@@ -313,6 +325,9 @@ namespace raft {
             grpc::ClientContext ctx;
             external::GetReply reply;
             external::Reply rp;
+            auto startTimePoint = std::chrono::system_clock::now();
+            ctx.set_deadline(startTimePoint + std::chrono::milliseconds(300));
+            ctx.set_idempotent(true);
             reply.set_status(true);
             reply.set_value(table[p->key]);
             pImpl->clientStubs[0]->ReplyGet(&ctx, reply, &rp);
@@ -320,6 +335,9 @@ namespace raft {
             grpc::ClientContext ctx;
             external::GetRequest request;
             external::Reply reply;
+            auto startTimePoint = std::chrono::system_clock::now();
+            ctx.set_deadline(startTimePoint + std::chrono::milliseconds(300));
+            ctx.set_idempotent(true);
             request.set_key(p->key);
             pImpl->redirectStubs[getExServer[exLeaderAddress]]->Get(&ctx, request, &reply);
         }
@@ -340,6 +358,9 @@ namespace raft {
             grpc::ClientContext ctx;
             rpc::RequestAppendEntries request;
             rpc::Reply reply;
+            auto startTimePoint = std::chrono::system_clock::now();
+            ctx.set_deadline(startTimePoint + std::chrono::milliseconds(300));
+            ctx.set_idempotent(true);
             request.set_term(currentTerm);
             request.set_leaderid(local_address);
             request.set_exleaderid(external_local_address);
@@ -358,20 +379,22 @@ namespace raft {
     }
 
     void Server::becomeLeader() {
-        if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : become Leader!"<<std::endl;}
+        if (true) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : become Leader! Term : " << currentTerm <<std::endl;}
         votedFor.clear();
         heart.becomeLeader();
         for (auto & i : nextIndex) i = log.size();
         for (auto & i : matchIndex) i = 0;
-        heartBeat();//TODO: Fix runtime error
+        heartBeat();
     }
 
     void Server::becomeFollower() {
+        if (true) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : become Follower! Term : " << currentTerm << std::endl;}
         votedFor.clear();
         heart.becomeFollower();
     }
 
     void Server::pushElection() {
+        if (true) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : become Candidate! Term : "<<currentTerm+1<<std::endl;}
         boost::lock_guard<boost::mutex> lock(mu);
         votesnum = 1; ++currentTerm;
         votedFor = local_address;
@@ -379,6 +402,9 @@ namespace raft {
             grpc::ClientContext ctx;
             rpc::RequestVote request;
             rpc::Reply reply;
+            auto startTimePoint = std::chrono::system_clock::now();
+            ctx.set_deadline(startTimePoint + std::chrono::milliseconds(300));
+            ctx.set_idempotent(true);
             request.set_term(currentTerm);
             request.set_candidateid(local_address);
             request.set_lastlogterm(get_lastlogterm());
@@ -397,8 +423,29 @@ namespace raft {
         os << local_address << " Log : contains " << log.size() << (log.size() == 1 ? " item" : " items") << std::endl;
         for (int i = 1; i <= 55; ++i) os << '-'; os << std::endl;
         os << "|index| term|        key         |        value       |" << std::endl;
+        os << "|-----|-----|--------------------|--------------------|" << std::endl;
+        for (int i = 0; i < log.size(); ++i) {
+            std::cout << '|' << fillCenter(std::to_string(log[i].index), 5)
+            << '|' << fillCenter(std::to_string(log[i].term), 5)
+            << '|' << fillCenter(log[i].key, 20)
+            << '|' << fillCenter(log[i].args, 20)
+            << '|' << std::endl;
+        }
         for (int i = 1; i <= 55; ++i) os << '-'; os << std::endl;
-        //TODO: add log framwork
+    }
+
+    std::string Server::fillCenter(const std::string &s, int len) {
+        if (s.size() > len) return s;
+        else {
+            int x1 = len - s.size();
+            int x2 = x1 / 2;
+            int x3 = x1 - x2;
+            std::string str;
+            for (int i = 1; i <= x2; ++i) str += " ";
+            str += s;
+            for (int i = 1; i <= x3; ++i) str += " ";
+            return str;
+        }
     }
 
     Server::LogEntry::LogEntry(uint64_t _term, uint64_t _index, const std::string &_key, const std::string &_args)

@@ -30,6 +30,7 @@ namespace raft {
         std::map<std::string, std::string> table;
         std::map<std::string, uint32_t> getServer;
         std::map<std::string, uint32_t> getExServer;
+        std::string fillCenter(const std::string &s, int len);
         State getState();
         uint64_t get_lastlogindex();
         uint64_t get_lastlogterm();
