@@ -6,13 +6,6 @@
 
 int main(int argc, char *argv[]) {
     std::ios::sync_with_stdio(false);
-
-    raft::Server server(argv[1]);
-    server.Run();
-    while (1) {
-
-    }
-    /*
     std::cout << "Hello, world!" << std::endl;
     raft::Client client(std::string(CMAKE_SOURCE_DIR) + "/cmake-build-debug/example/RaftConfig0.json");
     raft::Server server1(std::string(CMAKE_SOURCE_DIR) + "/cmake-build-debug/example/RaftConfig1.json");
@@ -21,7 +14,7 @@ int main(int argc, char *argv[]) {
     raft::Server server4(std::string(CMAKE_SOURCE_DIR) + "/cmake-build-debug/example/RaftConfig4.json");
     raft::Server server5(std::string(CMAKE_SOURCE_DIR) + "/cmake-build-debug/example/RaftConfig5.json");
 
-//    client.Run();
+    client.Run();
     server1.Run();
     server2.Run();
     server3.Run();
@@ -30,29 +23,20 @@ int main(int argc, char *argv[]) {
 
     sleep(1);
 
-    for (int i = 1; i <= 10; ++i) {
+    std::vector<std::pair<std::string, std::string>> p;
+    for (int i = 0; i < 10; ++i) {
         std::string a = std::to_string(rand());
         std::string b = std::to_string(rand());
+        p.emplace_back(std::make_pair(a, b));
         std::cout << a + "  " + b << std::endl;
         client.Put(a, b);
         sleep(0.3);
     }
 
     sleep(1);
-    server4.Stop();
 
-    sleep(1);
-
-    server4.WriteLog(std::cout);
-    server4.Run();
-
-    sleep(1);
-
-    for (int i = 1; i <= 0; ++i) {
-        std::string a = std::to_string(rand());
-        std::string b = std::to_string(rand());
-        std::cout << a + "  " + b << std::endl;
-        client.Put(a, b);
+    for (int i = 0; i < 10; ++i) {
+        client.Get(p[i].first);
         sleep(0.3);
     }
 
@@ -60,8 +44,7 @@ int main(int argc, char *argv[]) {
 
     std::cout << "Sleep Over." << std::endl;
 
-//    client.Stop();
-//    std::cout << "Finish Client" << std::endl;
+    client.Stop();
     server1.Stop();
     server2.Stop();
     server3.Stop();
@@ -73,6 +56,6 @@ int main(int argc, char *argv[]) {
     server3.WriteLog(std::cout);
     server4.WriteLog(std::cout);
     server5.WriteLog(std::cout);
-*/
+
     return 0;
 }

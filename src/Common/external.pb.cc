@@ -130,6 +130,7 @@ const ::google::protobuf::uint32 TableStruct_external_2eproto::offsets[] PROTOBU
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::raft::external::PutRequest, key_),
   PROTOBUF_FIELD_OFFSET(::raft::external::PutRequest, value_),
+  PROTOBUF_FIELD_OFFSET(::raft::external::PutRequest, client_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::raft::external::PutReply, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -142,6 +143,7 @@ const ::google::protobuf::uint32 TableStruct_external_2eproto::offsets[] PROTOBU
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::raft::external::GetRequest, key_),
+  PROTOBUF_FIELD_OFFSET(::raft::external::GetRequest, client_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::raft::external::GetReply, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -157,10 +159,10 @@ const ::google::protobuf::uint32 TableStruct_external_2eproto::offsets[] PROTOBU
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::raft::external::PutRequest)},
-  { 7, -1, sizeof(::raft::external::PutReply)},
-  { 13, -1, sizeof(::raft::external::GetRequest)},
-  { 19, -1, sizeof(::raft::external::GetReply)},
-  { 26, -1, sizeof(::raft::external::Reply)},
+  { 8, -1, sizeof(::raft::external::PutReply)},
+  { 14, -1, sizeof(::raft::external::GetRequest)},
+  { 21, -1, sizeof(::raft::external::GetReply)},
+  { 28, -1, sizeof(::raft::external::Reply)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -178,22 +180,23 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_external_2eproto[] =
-  "\n\016external.proto\022\rraft.external\"(\n\nPutRe"
-  "quest\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"\032\n\010Put"
-  "Reply\022\016\n\006status\030\001 \001(\010\"\031\n\nGetRequest\022\013\n\003k"
-  "ey\030\001 \001(\t\")\n\010GetReply\022\016\n\006status\030\001 \001(\010\022\r\n\005"
-  "value\030\002 \001(\t\"\007\n\005Reply2\370\001\n\010External\0228\n\003Put"
-  "\022\031.raft.external.PutRequest\032\024.raft.exter"
-  "nal.Reply\"\000\0228\n\003Get\022\031.raft.external.GetRe"
-  "quest\032\024.raft.external.Reply\"\000\022;\n\010ReplyPu"
-  "t\022\027.raft.external.PutReply\032\024.raft.extern"
-  "al.Reply\"\000\022;\n\010ReplyGet\022\027.raft.external.G"
-  "etReply\032\024.raft.external.Reply\"\000b\006proto3"
+  "\n\016external.proto\022\rraft.external\"8\n\nPutRe"
+  "quest\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\022\016\n\006cli"
+  "ent\030\003 \001(\t\"\032\n\010PutReply\022\016\n\006status\030\001 \001(\010\")\n"
+  "\nGetRequest\022\013\n\003key\030\001 \001(\t\022\016\n\006client\030\002 \001(\t"
+  "\")\n\010GetReply\022\016\n\006status\030\001 \001(\010\022\r\n\005value\030\002 "
+  "\001(\t\"\007\n\005Reply2\370\001\n\010External\0228\n\003Put\022\031.raft."
+  "external.PutRequest\032\024.raft.external.Repl"
+  "y\"\000\0228\n\003Get\022\031.raft.external.GetRequest\032\024."
+  "raft.external.Reply\"\000\022;\n\010ReplyPut\022\027.raft"
+  ".external.PutReply\032\024.raft.external.Reply"
+  "\"\000\022;\n\010ReplyGet\022\027.raft.external.GetReply\032"
+  "\024.raft.external.Reply\"\000b\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_external_2eproto = {
   false, InitDefaults_external_2eproto, 
   descriptor_table_protodef_external_2eproto,
-  "external.proto", &assign_descriptors_table_external_2eproto, 439,
+  "external.proto", &assign_descriptors_table_external_2eproto, 471,
 };
 
 void AddDescriptors_external_2eproto() {
@@ -219,6 +222,7 @@ class PutRequest::HasBitSetters {
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int PutRequest::kKeyFieldNumber;
 const int PutRequest::kValueFieldNumber;
+const int PutRequest::kClientFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 PutRequest::PutRequest()
@@ -238,6 +242,10 @@ PutRequest::PutRequest(const PutRequest& from)
   if (from.value().size() > 0) {
     value_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.value_);
   }
+  client_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.client().size() > 0) {
+    client_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.client_);
+  }
   // @@protoc_insertion_point(copy_constructor:raft.external.PutRequest)
 }
 
@@ -246,6 +254,7 @@ void PutRequest::SharedCtor() {
       &scc_info_PutRequest_external_2eproto.base);
   key_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   value_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  client_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 PutRequest::~PutRequest() {
@@ -256,6 +265,7 @@ PutRequest::~PutRequest() {
 void PutRequest::SharedDtor() {
   key_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   value_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  client_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 void PutRequest::SetCachedSize(int size) const {
@@ -275,6 +285,7 @@ void PutRequest::Clear() {
 
   key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   value_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  client_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   _internal_metadata_.Clear();
 }
 
@@ -314,6 +325,22 @@ const char* PutRequest::_InternalParse(const char* begin, const char* end, void*
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         ctx->extra_parse_data().SetFieldName("raft.external.PutRequest.value");
         object = msg->mutable_value();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // string client = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("raft.external.PutRequest.client");
+        object = msg->mutable_client();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
           goto string_till_end;
@@ -387,6 +414,21 @@ bool PutRequest::MergePartialFromCodedStream(
         break;
       }
 
+      // string client = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_client()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->client().data(), static_cast<int>(this->client().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "raft.external.PutRequest.client"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -434,6 +476,16 @@ void PutRequest::SerializeWithCachedSizes(
       2, this->value(), output);
   }
 
+  // string client = 3;
+  if (this->client().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->client().data(), static_cast<int>(this->client().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "raft.external.PutRequest.client");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      3, this->client(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -467,6 +519,17 @@ void PutRequest::SerializeWithCachedSizes(
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         2, this->value(), target);
+  }
+
+  // string client = 3;
+  if (this->client().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->client().data(), static_cast<int>(this->client().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "raft.external.PutRequest.client");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        3, this->client(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -504,6 +567,13 @@ size_t PutRequest::ByteSizeLong() const {
         this->value());
   }
 
+  // string client = 3;
+  if (this->client().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->client());
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -539,6 +609,10 @@ void PutRequest::MergeFrom(const PutRequest& from) {
 
     value_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.value_);
   }
+  if (from.client().size() > 0) {
+
+    client_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.client_);
+  }
 }
 
 void PutRequest::CopyFrom(const ::google::protobuf::Message& from) {
@@ -569,6 +643,8 @@ void PutRequest::InternalSwap(PutRequest* other) {
   key_.Swap(&other->key_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   value_.Swap(&other->value_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  client_.Swap(&other->client_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
 }
 
@@ -846,6 +922,7 @@ class GetRequest::HasBitSetters {
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int GetRequest::kKeyFieldNumber;
+const int GetRequest::kClientFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 GetRequest::GetRequest()
@@ -861,6 +938,10 @@ GetRequest::GetRequest(const GetRequest& from)
   if (from.key().size() > 0) {
     key_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.key_);
   }
+  client_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.client().size() > 0) {
+    client_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.client_);
+  }
   // @@protoc_insertion_point(copy_constructor:raft.external.GetRequest)
 }
 
@@ -868,6 +949,7 @@ void GetRequest::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_GetRequest_external_2eproto.base);
   key_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  client_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 GetRequest::~GetRequest() {
@@ -877,6 +959,7 @@ GetRequest::~GetRequest() {
 
 void GetRequest::SharedDtor() {
   key_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  client_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 void GetRequest::SetCachedSize(int size) const {
@@ -895,6 +978,7 @@ void GetRequest::Clear() {
   (void) cached_has_bits;
 
   key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  client_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   _internal_metadata_.Clear();
 }
 
@@ -918,6 +1002,22 @@ const char* GetRequest::_InternalParse(const char* begin, const char* end, void*
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         ctx->extra_parse_data().SetFieldName("raft.external.GetRequest.key");
         object = msg->mutable_key();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // string client = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("raft.external.GetRequest.client");
+        object = msg->mutable_client();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
           goto string_till_end;
@@ -976,6 +1076,21 @@ bool GetRequest::MergePartialFromCodedStream(
         break;
       }
 
+      // string client = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_client()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->client().data(), static_cast<int>(this->client().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "raft.external.GetRequest.client"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -1013,6 +1128,16 @@ void GetRequest::SerializeWithCachedSizes(
       1, this->key(), output);
   }
 
+  // string client = 2;
+  if (this->client().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->client().data(), static_cast<int>(this->client().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "raft.external.GetRequest.client");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      2, this->client(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -1035,6 +1160,17 @@ void GetRequest::SerializeWithCachedSizes(
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         1, this->key(), target);
+  }
+
+  // string client = 2;
+  if (this->client().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->client().data(), static_cast<int>(this->client().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "raft.external.GetRequest.client");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->client(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1063,6 +1199,13 @@ size_t GetRequest::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
         this->key());
+  }
+
+  // string client = 2;
+  if (this->client().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->client());
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -1096,6 +1239,10 @@ void GetRequest::MergeFrom(const GetRequest& from) {
 
     key_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.key_);
   }
+  if (from.client().size() > 0) {
+
+    client_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.client_);
+  }
 }
 
 void GetRequest::CopyFrom(const ::google::protobuf::Message& from) {
@@ -1124,6 +1271,8 @@ void GetRequest::InternalSwap(GetRequest* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
   key_.Swap(&other->key_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  client_.Swap(&other->client_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
 }
 

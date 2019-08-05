@@ -204,6 +204,20 @@ class PutRequest final :
   ::std::string* release_value();
   void set_allocated_value(::std::string* value);
 
+  // string client = 3;
+  void clear_client();
+  static const int kClientFieldNumber = 3;
+  const ::std::string& client() const;
+  void set_client(const ::std::string& value);
+  #if LANG_CXX11
+  void set_client(::std::string&& value);
+  #endif
+  void set_client(const char* value);
+  void set_client(const char* value, size_t size);
+  ::std::string* mutable_client();
+  ::std::string* release_client();
+  void set_allocated_client(::std::string* client);
+
   // @@protoc_insertion_point(class_scope:raft.external.PutRequest)
  private:
   class HasBitSetters;
@@ -211,6 +225,7 @@ class PutRequest final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr key_;
   ::google::protobuf::internal::ArenaStringPtr value_;
+  ::google::protobuf::internal::ArenaStringPtr client_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_external_2eproto;
 };
@@ -437,12 +452,27 @@ class GetRequest final :
   ::std::string* release_key();
   void set_allocated_key(::std::string* key);
 
+  // string client = 2;
+  void clear_client();
+  static const int kClientFieldNumber = 2;
+  const ::std::string& client() const;
+  void set_client(const ::std::string& value);
+  #if LANG_CXX11
+  void set_client(::std::string&& value);
+  #endif
+  void set_client(const char* value);
+  void set_client(const char* value, size_t size);
+  ::std::string* mutable_client();
+  ::std::string* release_client();
+  void set_allocated_client(::std::string* client);
+
   // @@protoc_insertion_point(class_scope:raft.external.GetRequest)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr key_;
+  ::google::protobuf::internal::ArenaStringPtr client_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_external_2eproto;
 };
@@ -795,6 +825,59 @@ inline void PutRequest::set_allocated_value(::std::string* value) {
   // @@protoc_insertion_point(field_set_allocated:raft.external.PutRequest.value)
 }
 
+// string client = 3;
+inline void PutRequest::clear_client() {
+  client_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& PutRequest::client() const {
+  // @@protoc_insertion_point(field_get:raft.external.PutRequest.client)
+  return client_.GetNoArena();
+}
+inline void PutRequest::set_client(const ::std::string& value) {
+  
+  client_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:raft.external.PutRequest.client)
+}
+#if LANG_CXX11
+inline void PutRequest::set_client(::std::string&& value) {
+  
+  client_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:raft.external.PutRequest.client)
+}
+#endif
+inline void PutRequest::set_client(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  client_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:raft.external.PutRequest.client)
+}
+inline void PutRequest::set_client(const char* value, size_t size) {
+  
+  client_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:raft.external.PutRequest.client)
+}
+inline ::std::string* PutRequest::mutable_client() {
+  
+  // @@protoc_insertion_point(field_mutable:raft.external.PutRequest.client)
+  return client_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* PutRequest::release_client() {
+  // @@protoc_insertion_point(field_release:raft.external.PutRequest.client)
+  
+  return client_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void PutRequest::set_allocated_client(::std::string* client) {
+  if (client != nullptr) {
+    
+  } else {
+    
+  }
+  client_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), client);
+  // @@protoc_insertion_point(field_set_allocated:raft.external.PutRequest.client)
+}
+
 // -------------------------------------------------------------------
 
 // PutReply
@@ -868,6 +951,59 @@ inline void GetRequest::set_allocated_key(::std::string* key) {
   }
   key_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), key);
   // @@protoc_insertion_point(field_set_allocated:raft.external.GetRequest.key)
+}
+
+// string client = 2;
+inline void GetRequest::clear_client() {
+  client_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& GetRequest::client() const {
+  // @@protoc_insertion_point(field_get:raft.external.GetRequest.client)
+  return client_.GetNoArena();
+}
+inline void GetRequest::set_client(const ::std::string& value) {
+  
+  client_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:raft.external.GetRequest.client)
+}
+#if LANG_CXX11
+inline void GetRequest::set_client(::std::string&& value) {
+  
+  client_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:raft.external.GetRequest.client)
+}
+#endif
+inline void GetRequest::set_client(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  client_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:raft.external.GetRequest.client)
+}
+inline void GetRequest::set_client(const char* value, size_t size) {
+  
+  client_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:raft.external.GetRequest.client)
+}
+inline ::std::string* GetRequest::mutable_client() {
+  
+  // @@protoc_insertion_point(field_mutable:raft.external.GetRequest.client)
+  return client_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* GetRequest::release_client() {
+  // @@protoc_insertion_point(field_release:raft.external.GetRequest.client)
+  
+  return client_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void GetRequest::set_allocated_client(::std::string* client) {
+  if (client != nullptr) {
+    
+  } else {
+    
+  }
+  client_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), client);
+  // @@protoc_insertion_point(field_set_allocated:raft.external.GetRequest.client)
 }
 
 // -------------------------------------------------------------------

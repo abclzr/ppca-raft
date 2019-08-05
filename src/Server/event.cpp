@@ -28,10 +28,12 @@ raft::event::RequestVote::RequestVote(const raft::rpc::RequestVote *p) {
 raft::event::Put::Put(const raft::external::PutRequest *p) {
     key = p->key();
     value = p->value();
+    client = p->client();
 }
 
 raft::event::Get::Get(const raft::external::GetRequest *p) {
     key = p->key();
+    client = p->client();
 }
 
 raft::event::ReplyAppendEntries::ReplyAppendEntries(const raft::rpc::ReplyAppendEntries *p) {

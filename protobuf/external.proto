@@ -5,6 +5,7 @@ package raft.external;
 message PutRequest {
   string key = 1;
   string value = 2;
+  string client = 3;
 }
 
 message PutReply {
@@ -13,6 +14,7 @@ message PutReply {
 
 message GetRequest {
   string key = 1;
+  string client = 2;
 }
 
 message GetReply {

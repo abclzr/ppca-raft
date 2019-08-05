@@ -49,11 +49,13 @@ namespace raft {
         struct Put {
             std::string key;
             std::string value;
+            std::string client;
             explicit Put(const external::PutRequest *);
         } *put;
 
         struct Get {
             std::string key;
+            std::string client;
             explicit Get(const external::GetRequest *);
         } *get;
 

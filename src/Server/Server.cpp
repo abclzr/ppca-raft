@@ -22,15 +22,18 @@ namespace raft {
 
         std::vector<std::string> srvList;
         std::vector<std::string> exSrvList;
+        std::vector<std::string> cltList;
         for (auto &&srv : tree.get_child("serverList"))
             if (srv.second.get_value<std::string>() != local_address)
                 srvList.emplace_back(srv.second.get_value<std::string>());
         for (auto &&srv : tree.get_child("externalServerList"))
             if (srv.second.get_value<std::string>() != external_local_address)
                 exSrvList.emplace_back(srv.second.get_value<std::string>());
-        for (auto &&clt : tree.get_child("clientList"))
+        for (auto &&clt : tree.get_child("clientList")) {
+            cltList.emplace_back(clt.second.get_value<std::string>());
             pImpl->clientStubs.emplace_back(external::External::NewStub((grpc::CreateChannel(
-                clt.second.get_value<std::string>(), grpc::InsecureChannelCredentials()))));
+                    clt.second.get_value<std::string>(), grpc::InsecureChannelCredentials()))));
+        }
 
         clustsize = srvList.size();
         uint32_t cnt = 0;
@@ -47,6 +50,11 @@ namespace raft {
             pImpl->redirectStubs.emplace_back(external::External::NewStub(grpc::CreateChannel(
                     srv, grpc::InsecureChannelCredentials())));
             getExServer[srv] = cnt++;
+        }
+
+        cnt = 0;
+        for (const auto &clt : cltList) {
+            getClient[clt] = cnt++;
         }
 
         currentTerm = 0;
@@ -105,10 +113,12 @@ namespace raft {
             cv.wait(lock);
             while (!q.empty()) {
                 event e = q.front();
-                lock.unlock();
                 processEvent(e);
-                lock.lock();
                 q.pop();
+            }
+            while (lastApplied < commitIndex) {
+                ++lastApplied;
+                table[log[lastApplied].key] = log[lastApplied].args;
             }
         }
     }
@@ -216,7 +226,7 @@ namespace raft {
         rpc::ReplyAppendEntries reply;
         rpc::Reply rp;
         auto startTimePoint = std::chrono::system_clock::now();
-        ctx.set_deadline(startTimePoint + std::chrono::milliseconds(300));
+        ctx.set_deadline(startTimePoint + std::chrono::milliseconds(RPC_TIME_OUT));
         ctx.set_idempotent(true);
 
         if (getState() != State::Follower) {
@@ -257,7 +267,7 @@ namespace raft {
         rpc::ReplyVote reply;
         rpc::Reply rp;
         auto startTimePoint = std::chrono::system_clock::now();
-        ctx.set_deadline(startTimePoint + std::chrono::milliseconds(300));
+        ctx.set_deadline(startTimePoint + std::chrono::milliseconds(RPC_TIME_OUT));
         ctx.set_idempotent(true);
 
         reply.set_followerid(local_address);
@@ -283,6 +293,10 @@ namespace raft {
         if (getState() == State::Leader) {
             if (p->ans) matchIndex[getServer[p->followerID]] = log.size() - 1;
             else --nextIndex[getServer[p->followerID]];
+            uint64_t minMatch = 0x7fffffff;
+            for (auto & i : matchIndex)
+                minMatch = std::min(minMatch, i);
+            if (minMatch > commitIndex) commitIndex = minMatch;
         }
     }
 
@@ -303,19 +317,20 @@ namespace raft {
             external::PutReply reply;
             external::Reply rp;
             auto startTimePoint = std::chrono::system_clock::now();
-            ctx.set_deadline(startTimePoint + std::chrono::milliseconds(300));
+            ctx.set_deadline(startTimePoint + std::chrono::milliseconds(RPC_TIME_OUT));
             ctx.set_idempotent(true);
             reply.set_status(true);
-            pImpl->clientStubs[0]->ReplyPut(&ctx, reply, &rp);
+            pImpl->clientStubs[getClient[p->client]]->ReplyPut(&ctx, reply, &rp);
         } else {
             grpc::ClientContext ctx;
             external::PutRequest request;
             external::Reply reply;
             auto startTimePoint = std::chrono::system_clock::now();
-            ctx.set_deadline(startTimePoint + std::chrono::milliseconds(300));
+            ctx.set_deadline(startTimePoint + std::chrono::milliseconds(RPC_TIME_OUT));
             ctx.set_idempotent(true);
             request.set_key(p->key);
             request.set_value(p->value);
+            request.set_client(p->client);
             pImpl->redirectStubs[getExServer[exLeaderAddress]]->Put(&ctx, request, &reply);
         }
     }
@@ -326,19 +341,20 @@ namespace raft {
             external::GetReply reply;
             external::Reply rp;
             auto startTimePoint = std::chrono::system_clock::now();
-            ctx.set_deadline(startTimePoint + std::chrono::milliseconds(300));
+            ctx.set_deadline(startTimePoint + std::chrono::milliseconds(RPC_TIME_OUT));
             ctx.set_idempotent(true);
             reply.set_status(true);
             reply.set_value(table[p->key]);
-            pImpl->clientStubs[0]->ReplyGet(&ctx, reply, &rp);
+            pImpl->clientStubs[getClient[p->client]]->ReplyGet(&ctx, reply, &rp);
         } else {
             grpc::ClientContext ctx;
             external::GetRequest request;
             external::Reply reply;
             auto startTimePoint = std::chrono::system_clock::now();
-            ctx.set_deadline(startTimePoint + std::chrono::milliseconds(300));
+            ctx.set_deadline(startTimePoint + std::chrono::milliseconds(RPC_TIME_OUT));
             ctx.set_idempotent(true);
             request.set_key(p->key);
+            request.set_client(p->client);
             pImpl->redirectStubs[getExServer[exLeaderAddress]]->Get(&ctx, request, &reply);
         }
     }
@@ -359,7 +375,7 @@ namespace raft {
             rpc::RequestAppendEntries request;
             rpc::Reply reply;
             auto startTimePoint = std::chrono::system_clock::now();
-            ctx.set_deadline(startTimePoint + std::chrono::milliseconds(300));
+            ctx.set_deadline(startTimePoint + std::chrono::milliseconds(RPC_TIME_OUT));
             ctx.set_idempotent(true);
             request.set_term(currentTerm);
             request.set_leaderid(local_address);
@@ -403,7 +419,7 @@ namespace raft {
             rpc::RequestVote request;
             rpc::Reply reply;
             auto startTimePoint = std::chrono::system_clock::now();
-            ctx.set_deadline(startTimePoint + std::chrono::milliseconds(300));
+            ctx.set_deadline(startTimePoint + std::chrono::milliseconds(RPC_TIME_OUT));
             ctx.set_idempotent(true);
             request.set_term(currentTerm);
             request.set_candidateid(local_address);
@@ -420,7 +436,7 @@ namespace raft {
     }
 
     void Server::WriteLog(std::ostream &os) {
-        os << local_address << " Log : contains " << log.size() << (log.size() == 1 ? " item" : " items") << std::endl;
+        os << local_address << " Log : contains " << log.size() << (log.size() == 1 ? " item" : " items") << " Applied " << lastApplied << " items." << std::endl;
         for (int i = 1; i <= 55; ++i) os << '-'; os << std::endl;
         os << "|index| term|        key         |        value       |" << std::endl;
         os << "|-----|-----|--------------------|--------------------|" << std::endl;
