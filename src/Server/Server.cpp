@@ -113,7 +113,9 @@ namespace raft {
             cv.wait(lock);
             while (!q.empty()) {
                 event e = q.front();
+                lock.unlock();
                 processEvent(e);
+                lock.lock();
                 q.pop();
             }
         }
