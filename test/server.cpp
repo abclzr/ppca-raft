@@ -11,7 +11,7 @@
 int main(int argc, char *argv[]) {
     std::ios::sync_with_stdio(false);
 
-    raft::Server server(argv[1]);
+    raft::Server server(std::string(CMAKE_SOURCE_DIR) + "/cmake-build-debug/example/RaftConfig" + std::string(argv[1]) + ".json");
     server.Run();
     while (1) {
 

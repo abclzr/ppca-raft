@@ -11,18 +11,25 @@
 int main(int argc, char *argv[]) {
     std::ios::sync_with_stdio(false);
 
-    raft::Client client(argv[1]);
+    raft::Client client(std::string(CMAKE_SOURCE_DIR) + "/cmake-build-debug/example/ClientConfig" + std::string(argv[1]) + ".json");
     client.Run();
 
-    sleep(1);
-    for (int i = 1; i <= 10000; ++i) {
-        client.Put(std::to_string(i), std::to_string(i));
+    std::string op, k, v;
+    uint32_t cnt = 0;
+    while (std::cin.peek() != EOF) {
+        std::cerr << "ID : " << ++cnt << std::endl;
+        std::cin >> op;
+        if (op == "put") {
+            std::cin >> k >> v;
+            client.Put(k, v);
+        } else {
+            std::cin >> k;
+            std::cout << k << " ";
+            client.Get(k);
+        }
+        while (std::isspace(std::cin.peek()))
+            std::cin.get();
     }
 
-    for (int i = 1; i <= 10000; ++i) {
-        client.Get(std::to_string(i));
-        sleep(0.3);
-    }
-    sleep(1);
     return 0;
 }

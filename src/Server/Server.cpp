@@ -116,10 +116,6 @@ namespace raft {
                 processEvent(e);
                 q.pop();
             }
-            while (lastApplied < commitIndex) {
-                ++lastApplied;
-                table[log[lastApplied].key] = log[lastApplied].args;
-            }
         }
     }
 
@@ -182,6 +178,10 @@ namespace raft {
             case EventType::ReplyVote:
                 replyVote(e.ReplyV);
                 break;
+        }
+        while (lastApplied < commitIndex) {
+            ++lastApplied;
+            table[log[lastApplied].key] = log[lastApplied].args;
         }
     }
 
@@ -291,12 +291,26 @@ namespace raft {
 
     void Server::replyAppendEntries(const event::ReplyAppendEntries *p) {
         if (getState() == State::Leader) {
-            if (p->ans) matchIndex[getServer[p->followerID]] = log.size() - 1;
+            if (p->ans) matchIndex[getServer[p->followerID]] = preMatch;
             else --nextIndex[getServer[p->followerID]];
-            uint64_t minMatch = 0x7fffffff;
-            for (auto & i : matchIndex)
-                minMatch = std::min(minMatch, i);
-            if (minMatch > commitIndex) commitIndex = minMatch;
+            if (p->ans) {
+                ++replyNum;
+                minMatch = std::min(minMatch, matchIndex[getServer[p->followerID]]);
+                if (replyNum > clustsize / 2) {
+                    commitIndex = minMatch;
+                    for (const auto & i : putClient) {
+                        grpc::ClientContext ctx;
+                        external::PutReply reply;
+                        external::Reply rp;
+                        auto startTimePoint = std::chrono::system_clock::now();
+                        ctx.set_deadline(startTimePoint + std::chrono::milliseconds(RPC_TIME_OUT));
+                        ctx.set_idempotent(true);
+                        reply.set_status(true);
+                        pImpl->clientStubs[getClient[i]]->ReplyPut(&ctx, reply, &rp);
+                    }
+                    putClient.clear();
+                }
+            }
         }
     }
 
@@ -313,14 +327,7 @@ namespace raft {
         if (getState() == State::Leader) {
             auto ind = log.size();
             log.emplace_back(LogEntry(currentTerm, ind, p->key, p->value));
-            grpc::ClientContext ctx;
-            external::PutReply reply;
-            external::Reply rp;
-            auto startTimePoint = std::chrono::system_clock::now();
-            ctx.set_deadline(startTimePoint + std::chrono::milliseconds(RPC_TIME_OUT));
-            ctx.set_idempotent(true);
-            reply.set_status(true);
-            pImpl->clientStubs[getClient[p->client]]->ReplyPut(&ctx, reply, &rp);
+            putClient.emplace_back(p->client);
         } else {
             grpc::ClientContext ctx;
             external::PutRequest request;
@@ -369,7 +376,7 @@ namespace raft {
     }
 
     void Server::heartBeat() {
-        int tmp = 0;
+        int tmp = 0; minMatch = preMatch = log.size() - 1; replyNum = 1;
         for (const auto & i : pImpl->stubs) {
             grpc::ClientContext ctx;
             rpc::RequestAppendEntries request;
@@ -395,7 +402,7 @@ namespace raft {
     }
 
     void Server::becomeLeader() {
-        if (true) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : become Leader! Term : " << currentTerm <<std::endl;}
+        if (DEBUG2) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : become Leader! Term : " << currentTerm <<std::endl;}
         votedFor.clear();
         heart.becomeLeader();
         for (auto & i : nextIndex) i = log.size();
@@ -404,13 +411,13 @@ namespace raft {
     }
 
     void Server::becomeFollower() {
-        if (true) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : become Follower! Term : " << currentTerm << std::endl;}
+        if (DEBUG2) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : become Follower! Term : " << currentTerm << std::endl;}
         votedFor.clear();
         heart.becomeFollower();
     }
 
     void Server::pushElection() {
-        if (true) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : become Candidate! Term : "<<currentTerm+1<<std::endl;}
+        if (DEBUG2) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : become Candidate! Term : "<<currentTerm+1<<std::endl;}
         boost::lock_guard<boost::mutex> lock(mu);
         votesnum = 1; ++currentTerm;
         votedFor = local_address;

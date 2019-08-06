@@ -30,15 +30,17 @@ public:
   void Run();
   void Stop();
 
-  void Put(std::string key, std::string value, std::uint64_t timeout = 5000);
+  void Put(std::string key, std::string value, std::uint64_t timeout = 10000);
 
-  std::string Get(std::string key, std::uint64_t timeout = 5000);
+  std::string Get(std::string key, std::uint64_t timeout = 10000);
 
   void replyput(const external::PutReply *request, external::Reply *response);
 
   void replyget(const external::GetReply *request, external::Reply *response);
 private:
   struct Impl;
+  boost::mutex mu;
+  boost::condition_variable cv;
   std::unique_ptr<Impl> pImpl;
 
 }; // class Client

@@ -31,6 +31,10 @@ namespace raft {
         std::map<std::string, uint32_t> getServer;
         std::map<std::string, uint32_t> getExServer;
         std::map<std::string, uint32_t> getClient;
+        std::vector<std::string> putClient;
+        uint64_t minMatch;
+        uint64_t replyNum;
+        uint64_t preMatch;
         std::string fillCenter(const std::string &s, int len);
         State getState();
         uint64_t get_lastlogindex();

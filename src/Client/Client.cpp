@@ -60,10 +60,20 @@ void Client::Put(std::string key, std::string value, uint64_t timeout) {
     external::PutRequest request;
     request.set_key(key);
     request.set_value(value);
+    request.set_client(local_address);
     external::Reply reply;
     auto status = stub->Put(&ctx, request, &reply);
 
-    return;
+    if (status.ok()) {
+        boost::unique_lock<boost::mutex> lock(mu);
+        auto result = cv.wait_for(lock, boost::chrono::milliseconds(100));
+        if (result == boost::cv_status::no_timeout) {
+            return;
+        } else {
+            pImpl->cur++;
+            continue;
+        }
+    }
     pImpl->cur++;
   }
 
@@ -81,11 +91,20 @@ std::string Client::Get(std::string key, uint64_t timeout) {
 
     external::GetRequest request;
     request.set_key(key);
+    request.set_client(local_address);
     external::Reply reply;
     auto status = stub->Get(&ctx, request, &reply);
 
-    if (status.ok())
-      return "";
+    if (status.ok()) {
+        boost::unique_lock<boost::mutex> lock(mu);
+        auto result = cv.wait_for(lock, boost::chrono::milliseconds(100));
+        if (result == boost::cv_status::no_timeout) {
+            return "";
+        } else {
+            pImpl->cur++;
+            continue;
+        }
+    }
     pImpl->cur++;
   }
 
@@ -119,11 +138,13 @@ std::string Client::Get(std::string key, uint64_t timeout) {
     }
 
     void Client::replyput(const external::PutReply *request, external::Reply *response) {
-
+        cv.notify_one();
     }
 
     void Client::replyget(const external::GetReply *request, external::Reply *response) {
-        std::cout << "Client Received : " << request->value() << std::endl;
+        std::cout << request->value() << std::endl;
+        std::cerr << "Client Received : " << request->value() << std::endl;
+        cv.notify_one();
     }
 
 } // namespace ppca
