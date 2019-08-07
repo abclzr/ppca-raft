@@ -158,6 +158,7 @@ namespace raft {
 
     void Server::processEvent(const event &e) {
         if (DEBUG) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " received: " << e.print()<<std::endl;}
+        boost::lock_guard<boost::mutex> lock(dataMutex);
         switch (e.type) {
             case EventType::HeartBeat:
                 heartBeat();
@@ -300,7 +301,7 @@ namespace raft {
                 minMatch = std::min(minMatch, matchIndex[getServer[p->followerID]]);
                 if (replyNum > clustsize / 2) {
                     commitIndex = minMatch;
-                    for (const auto & i : putClient) {
+                    for (const auto & i : waitingClient) {
                         grpc::ClientContext ctx;
                         external::PutReply reply;
                         external::Reply rp;
@@ -308,9 +309,10 @@ namespace raft {
                         ctx.set_deadline(startTimePoint + std::chrono::milliseconds(RPC_TIME_OUT));
                         ctx.set_idempotent(true);
                         reply.set_status(true);
-                        pImpl->clientStubs[getClient[i]]->ReplyPut(&ctx, reply, &rp);
+                        reply.set_timestamp(i.second);
+                        pImpl->clientStubs[getClient[i.first]]->ReplyPut(&ctx, reply, &rp);
                     }
-                    putClient.clear();
+                    waitingClient.clear();
                 }
             }
         }
@@ -329,7 +331,7 @@ namespace raft {
         if (getState() == State::Leader) {
             auto ind = log.size();
             log.emplace_back(LogEntry(currentTerm, ind, p->key, p->value));
-            putClient.emplace_back(p->client);
+            waitingClient.emplace_back(std::make_pair(p->client, p->timestamp));
         } else {
             grpc::ClientContext ctx;
             external::PutRequest request;
@@ -340,6 +342,7 @@ namespace raft {
             request.set_key(p->key);
             request.set_value(p->value);
             request.set_client(p->client);
+            request.set_timestamp(p->timestamp);
             pImpl->redirectStubs[getExServer[exLeaderAddress]]->Put(&ctx, request, &reply);
         }
     }
@@ -354,6 +357,7 @@ namespace raft {
             ctx.set_idempotent(true);
             reply.set_status(true);
             reply.set_value(table[p->key]);
+            reply.set_timestamp(p->timestamp);
             pImpl->clientStubs[getClient[p->client]]->ReplyGet(&ctx, reply, &rp);
         } else {
             grpc::ClientContext ctx;
@@ -364,6 +368,7 @@ namespace raft {
             ctx.set_idempotent(true);
             request.set_key(p->key);
             request.set_client(p->client);
+            request.set_timestamp(p->timestamp);
             pImpl->redirectStubs[getExServer[exLeaderAddress]]->Get(&ctx, request, &reply);
         }
     }
@@ -420,7 +425,7 @@ namespace raft {
 
     void Server::pushElection() {
         if (DEBUG2) {std::cerr << (double) (clock() - st) / 1000 << " " << std::setw(20) << local_address << " : become Candidate! Term : "<<currentTerm+1<<std::endl;}
-        boost::lock_guard<boost::mutex> lock(mu);
+        boost::lock_guard<boost::mutex> lock(dataMutex);
         votesnum = 1; ++currentTerm;
         votedFor = local_address;
         for (const auto & i : pImpl->stubs) {
@@ -440,7 +445,7 @@ namespace raft {
     }
 
     void Server::pushHearBeat() {
-        boost::lock_guard<boost::mutex> lock(mu);
+        boost::lock_guard<boost::mutex> lock(dataMutex);
         heartBeat();
     }
 

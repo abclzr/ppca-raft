@@ -29,11 +29,13 @@ raft::event::Put::Put(const raft::external::PutRequest *p) {
     key = p->key();
     value = p->value();
     client = p->client();
+    timestamp = p->timestamp();
 }
 
 raft::event::Get::Get(const raft::external::GetRequest *p) {
     key = p->key();
     client = p->client();
+    timestamp = p->timestamp();
 }
 
 raft::event::ReplyAppendEntries::ReplyAppendEntries(const raft::rpc::ReplyAppendEntries *p) {

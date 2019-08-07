@@ -31,7 +31,7 @@ namespace raft {
         std::map<std::string, uint32_t> getServer;
         std::map<std::string, uint32_t> getExServer;
         std::map<std::string, uint32_t> getClient;
-        std::vector<std::string> putClient;
+        std::vector<std::pair<std::string, uint64_t>> waitingClient;
         uint64_t minMatch;
         uint64_t replyNum;
         uint64_t preMatch;
@@ -62,6 +62,7 @@ namespace raft {
         //event_queue
         boost::condition_variable cv;
         boost::mutex mu;
+        boost::mutex dataMutex;
         std::queue<event> q;
         void processEvent(const event &);
 

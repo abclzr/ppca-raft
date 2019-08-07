@@ -42,6 +42,7 @@ private:
   boost::mutex mu;
   boost::condition_variable cv;
   std::unique_ptr<Impl> pImpl;
+  uint64_t timeStamp;
 
 }; // class Client
 

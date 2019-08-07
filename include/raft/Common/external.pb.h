@@ -218,6 +218,12 @@ class PutRequest final :
   ::std::string* release_client();
   void set_allocated_client(::std::string* client);
 
+  // uint64 timeStamp = 4;
+  void clear_timestamp();
+  static const int kTimeStampFieldNumber = 4;
+  ::google::protobuf::uint64 timestamp() const;
+  void set_timestamp(::google::protobuf::uint64 value);
+
   // @@protoc_insertion_point(class_scope:raft.external.PutRequest)
  private:
   class HasBitSetters;
@@ -226,6 +232,7 @@ class PutRequest final :
   ::google::protobuf::internal::ArenaStringPtr key_;
   ::google::protobuf::internal::ArenaStringPtr value_;
   ::google::protobuf::internal::ArenaStringPtr client_;
+  ::google::protobuf::uint64 timestamp_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_external_2eproto;
 };
@@ -326,6 +333,12 @@ class PutReply final :
 
   // accessors -------------------------------------------------------
 
+  // uint64 timeStamp = 2;
+  void clear_timestamp();
+  static const int kTimeStampFieldNumber = 2;
+  ::google::protobuf::uint64 timestamp() const;
+  void set_timestamp(::google::protobuf::uint64 value);
+
   // bool status = 1;
   void clear_status();
   static const int kStatusFieldNumber = 1;
@@ -337,6 +350,7 @@ class PutReply final :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::uint64 timestamp_;
   bool status_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_external_2eproto;
@@ -466,6 +480,12 @@ class GetRequest final :
   ::std::string* release_client();
   void set_allocated_client(::std::string* client);
 
+  // uint64 timeStamp = 3;
+  void clear_timestamp();
+  static const int kTimeStampFieldNumber = 3;
+  ::google::protobuf::uint64 timestamp() const;
+  void set_timestamp(::google::protobuf::uint64 value);
+
   // @@protoc_insertion_point(class_scope:raft.external.GetRequest)
  private:
   class HasBitSetters;
@@ -473,6 +493,7 @@ class GetRequest final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr key_;
   ::google::protobuf::internal::ArenaStringPtr client_;
+  ::google::protobuf::uint64 timestamp_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_external_2eproto;
 };
@@ -587,6 +608,12 @@ class GetReply final :
   ::std::string* release_value();
   void set_allocated_value(::std::string* value);
 
+  // uint64 timeStamp = 3;
+  void clear_timestamp();
+  static const int kTimeStampFieldNumber = 3;
+  ::google::protobuf::uint64 timestamp() const;
+  void set_timestamp(::google::protobuf::uint64 value);
+
   // bool status = 1;
   void clear_status();
   static const int kStatusFieldNumber = 1;
@@ -599,6 +626,7 @@ class GetReply final :
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr value_;
+  ::google::protobuf::uint64 timestamp_;
   bool status_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_external_2eproto;
@@ -878,6 +906,20 @@ inline void PutRequest::set_allocated_client(::std::string* client) {
   // @@protoc_insertion_point(field_set_allocated:raft.external.PutRequest.client)
 }
 
+// uint64 timeStamp = 4;
+inline void PutRequest::clear_timestamp() {
+  timestamp_ = PROTOBUF_ULONGLONG(0);
+}
+inline ::google::protobuf::uint64 PutRequest::timestamp() const {
+  // @@protoc_insertion_point(field_get:raft.external.PutRequest.timeStamp)
+  return timestamp_;
+}
+inline void PutRequest::set_timestamp(::google::protobuf::uint64 value) {
+  
+  timestamp_ = value;
+  // @@protoc_insertion_point(field_set:raft.external.PutRequest.timeStamp)
+}
+
 // -------------------------------------------------------------------
 
 // PutReply
@@ -894,6 +936,20 @@ inline void PutReply::set_status(bool value) {
   
   status_ = value;
   // @@protoc_insertion_point(field_set:raft.external.PutReply.status)
+}
+
+// uint64 timeStamp = 2;
+inline void PutReply::clear_timestamp() {
+  timestamp_ = PROTOBUF_ULONGLONG(0);
+}
+inline ::google::protobuf::uint64 PutReply::timestamp() const {
+  // @@protoc_insertion_point(field_get:raft.external.PutReply.timeStamp)
+  return timestamp_;
+}
+inline void PutReply::set_timestamp(::google::protobuf::uint64 value) {
+  
+  timestamp_ = value;
+  // @@protoc_insertion_point(field_set:raft.external.PutReply.timeStamp)
 }
 
 // -------------------------------------------------------------------
@@ -1006,6 +1062,20 @@ inline void GetRequest::set_allocated_client(::std::string* client) {
   // @@protoc_insertion_point(field_set_allocated:raft.external.GetRequest.client)
 }
 
+// uint64 timeStamp = 3;
+inline void GetRequest::clear_timestamp() {
+  timestamp_ = PROTOBUF_ULONGLONG(0);
+}
+inline ::google::protobuf::uint64 GetRequest::timestamp() const {
+  // @@protoc_insertion_point(field_get:raft.external.GetRequest.timeStamp)
+  return timestamp_;
+}
+inline void GetRequest::set_timestamp(::google::protobuf::uint64 value) {
+  
+  timestamp_ = value;
+  // @@protoc_insertion_point(field_set:raft.external.GetRequest.timeStamp)
+}
+
 // -------------------------------------------------------------------
 
 // GetReply
@@ -1075,6 +1145,20 @@ inline void GetReply::set_allocated_value(::std::string* value) {
   }
   value_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
   // @@protoc_insertion_point(field_set_allocated:raft.external.GetReply.value)
+}
+
+// uint64 timeStamp = 3;
+inline void GetReply::clear_timestamp() {
+  timestamp_ = PROTOBUF_ULONGLONG(0);
+}
+inline ::google::protobuf::uint64 GetReply::timestamp() const {
+  // @@protoc_insertion_point(field_get:raft.external.GetReply.timeStamp)
+  return timestamp_;
+}
+inline void GetReply::set_timestamp(::google::protobuf::uint64 value) {
+  
+  timestamp_ = value;
+  // @@protoc_insertion_point(field_set:raft.external.GetReply.timeStamp)
 }
 
 // -------------------------------------------------------------------

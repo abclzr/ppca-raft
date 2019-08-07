@@ -249,12 +249,12 @@ int main(int argc, char **argv) {
     assert(argc == 3);
     RaftTest test(argv[1], argv[2]);
 
-    std::cerr << "running naive_test0:\n";
-    std::cerr << (test.naive(3, 1, 10) ? "passed" : "failed");
-    std::cerr << std::endl << std::endl;
-      std::cerr << "running naive_test1:\n";
-      std::cerr << (test.naive(3, 3, 100) ? "passed" : "failed");
-      std::cerr << std::endl << std::endl;
+//    std::cerr << "running naive_test0:\n";
+//    std::cerr << (test.naive(3, 1, 10) ? "passed" : "failed");
+//    std::cerr << std::endl << std::endl;
+//      std::cerr << "running naive_test1:\n";
+//      std::cerr << (test.naive(3, 3, 100) ? "passed" : "failed");
+//      std::cerr << std::endl << std::endl;
 //      std::cerr << "running naive_test2:\n";
 //      std::cerr << (test.naive(5, 5, 1000) ? "passed" : "failed");
 //      std::cerr << std::endl << std::endl;
@@ -262,9 +262,9 @@ int main(int argc, char **argv) {
 //      std::cerr << (test.naive(3, 5, 1000) ? "passed" : "failed");
 //      std::cerr << std::endl << std::endl;
 
-    //  std::cerr << "running comprehensive_test:\n";
-    //  std::cerr << (test.comprehensive(5000, 0.5) ? "passed" : "failed");
-    //  std::cerr << std::endl << std::endl;
+      std::cerr << "running comprehensive_test:\n";
+      std::cerr << (test.comprehensive(100, 0.5) ? "passed" : "failed");
+      std::cerr << std::endl << std::endl;
 
     return 0;
 }

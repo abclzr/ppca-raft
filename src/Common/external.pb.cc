@@ -131,12 +131,14 @@ const ::google::protobuf::uint32 TableStruct_external_2eproto::offsets[] PROTOBU
   PROTOBUF_FIELD_OFFSET(::raft::external::PutRequest, key_),
   PROTOBUF_FIELD_OFFSET(::raft::external::PutRequest, value_),
   PROTOBUF_FIELD_OFFSET(::raft::external::PutRequest, client_),
+  PROTOBUF_FIELD_OFFSET(::raft::external::PutRequest, timestamp_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::raft::external::PutReply, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::raft::external::PutReply, status_),
+  PROTOBUF_FIELD_OFFSET(::raft::external::PutReply, timestamp_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::raft::external::GetRequest, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -144,6 +146,7 @@ const ::google::protobuf::uint32 TableStruct_external_2eproto::offsets[] PROTOBU
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::raft::external::GetRequest, key_),
   PROTOBUF_FIELD_OFFSET(::raft::external::GetRequest, client_),
+  PROTOBUF_FIELD_OFFSET(::raft::external::GetRequest, timestamp_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::raft::external::GetReply, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -151,6 +154,7 @@ const ::google::protobuf::uint32 TableStruct_external_2eproto::offsets[] PROTOBU
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::raft::external::GetReply, status_),
   PROTOBUF_FIELD_OFFSET(::raft::external::GetReply, value_),
+  PROTOBUF_FIELD_OFFSET(::raft::external::GetReply, timestamp_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::raft::external::Reply, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -159,10 +163,10 @@ const ::google::protobuf::uint32 TableStruct_external_2eproto::offsets[] PROTOBU
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::raft::external::PutRequest)},
-  { 8, -1, sizeof(::raft::external::PutReply)},
-  { 14, -1, sizeof(::raft::external::GetRequest)},
-  { 21, -1, sizeof(::raft::external::GetReply)},
-  { 28, -1, sizeof(::raft::external::Reply)},
+  { 9, -1, sizeof(::raft::external::PutReply)},
+  { 16, -1, sizeof(::raft::external::GetRequest)},
+  { 24, -1, sizeof(::raft::external::GetReply)},
+  { 32, -1, sizeof(::raft::external::Reply)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -180,23 +184,25 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_external_2eproto[] =
-  "\n\016external.proto\022\rraft.external\"8\n\nPutRe"
+  "\n\016external.proto\022\rraft.external\"K\n\nPutRe"
   "quest\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\022\016\n\006cli"
-  "ent\030\003 \001(\t\"\032\n\010PutReply\022\016\n\006status\030\001 \001(\010\")\n"
-  "\nGetRequest\022\013\n\003key\030\001 \001(\t\022\016\n\006client\030\002 \001(\t"
-  "\")\n\010GetReply\022\016\n\006status\030\001 \001(\010\022\r\n\005value\030\002 "
-  "\001(\t\"\007\n\005Reply2\370\001\n\010External\0228\n\003Put\022\031.raft."
-  "external.PutRequest\032\024.raft.external.Repl"
-  "y\"\000\0228\n\003Get\022\031.raft.external.GetRequest\032\024."
-  "raft.external.Reply\"\000\022;\n\010ReplyPut\022\027.raft"
-  ".external.PutReply\032\024.raft.external.Reply"
-  "\"\000\022;\n\010ReplyGet\022\027.raft.external.GetReply\032"
-  "\024.raft.external.Reply\"\000b\006proto3"
+  "ent\030\003 \001(\t\022\021\n\ttimeStamp\030\004 \001(\004\"-\n\010PutReply"
+  "\022\016\n\006status\030\001 \001(\010\022\021\n\ttimeStamp\030\002 \001(\004\"<\n\nG"
+  "etRequest\022\013\n\003key\030\001 \001(\t\022\016\n\006client\030\002 \001(\t\022\021"
+  "\n\ttimeStamp\030\003 \001(\004\"<\n\010GetReply\022\016\n\006status\030"
+  "\001 \001(\010\022\r\n\005value\030\002 \001(\t\022\021\n\ttimeStamp\030\003 \001(\004\""
+  "\007\n\005Reply2\370\001\n\010External\0228\n\003Put\022\031.raft.exte"
+  "rnal.PutRequest\032\024.raft.external.Reply\"\000\022"
+  "8\n\003Get\022\031.raft.external.GetRequest\032\024.raft"
+  ".external.Reply\"\000\022;\n\010ReplyPut\022\027.raft.ext"
+  "ernal.PutReply\032\024.raft.external.Reply\"\000\022;"
+  "\n\010ReplyGet\022\027.raft.external.GetReply\032\024.ra"
+  "ft.external.Reply\"\000b\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_external_2eproto = {
   false, InitDefaults_external_2eproto, 
   descriptor_table_protodef_external_2eproto,
-  "external.proto", &assign_descriptors_table_external_2eproto, 471,
+  "external.proto", &assign_descriptors_table_external_2eproto, 547,
 };
 
 void AddDescriptors_external_2eproto() {
@@ -223,6 +229,7 @@ class PutRequest::HasBitSetters {
 const int PutRequest::kKeyFieldNumber;
 const int PutRequest::kValueFieldNumber;
 const int PutRequest::kClientFieldNumber;
+const int PutRequest::kTimeStampFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 PutRequest::PutRequest()
@@ -246,6 +253,7 @@ PutRequest::PutRequest(const PutRequest& from)
   if (from.client().size() > 0) {
     client_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.client_);
   }
+  timestamp_ = from.timestamp_;
   // @@protoc_insertion_point(copy_constructor:raft.external.PutRequest)
 }
 
@@ -255,6 +263,7 @@ void PutRequest::SharedCtor() {
   key_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   value_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   client_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  timestamp_ = PROTOBUF_ULONGLONG(0);
 }
 
 PutRequest::~PutRequest() {
@@ -286,6 +295,7 @@ void PutRequest::Clear() {
   key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   value_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   client_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  timestamp_ = PROTOBUF_ULONGLONG(0);
   _internal_metadata_.Clear();
 }
 
@@ -348,6 +358,13 @@ const char* PutRequest::_InternalParse(const char* begin, const char* end, void*
         GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
         ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
         ptr += size;
+        break;
+      }
+      // uint64 timeStamp = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 32) goto handle_unusual;
+        msg->set_timestamp(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
       default: {
@@ -429,6 +446,19 @@ bool PutRequest::MergePartialFromCodedStream(
         break;
       }
 
+      // uint64 timeStamp = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (32 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
+                 input, &timestamp_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -486,6 +516,11 @@ void PutRequest::SerializeWithCachedSizes(
       3, this->client(), output);
   }
 
+  // uint64 timeStamp = 4;
+  if (this->timestamp() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt64(4, this->timestamp(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -532,6 +567,11 @@ void PutRequest::SerializeWithCachedSizes(
         3, this->client(), target);
   }
 
+  // uint64 timeStamp = 4;
+  if (this->timestamp() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(4, this->timestamp(), target);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -574,6 +614,13 @@ size_t PutRequest::ByteSizeLong() const {
         this->client());
   }
 
+  // uint64 timeStamp = 4;
+  if (this->timestamp() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt64Size(
+        this->timestamp());
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -613,6 +660,9 @@ void PutRequest::MergeFrom(const PutRequest& from) {
 
     client_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.client_);
   }
+  if (from.timestamp() != 0) {
+    set_timestamp(from.timestamp());
+  }
 }
 
 void PutRequest::CopyFrom(const ::google::protobuf::Message& from) {
@@ -646,6 +696,7 @@ void PutRequest::InternalSwap(PutRequest* other) {
     GetArenaNoVirtual());
   client_.Swap(&other->client_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
+  swap(timestamp_, other->timestamp_);
 }
 
 ::google::protobuf::Metadata PutRequest::GetMetadata() const {
@@ -664,6 +715,7 @@ class PutReply::HasBitSetters {
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int PutReply::kStatusFieldNumber;
+const int PutReply::kTimeStampFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 PutReply::PutReply()
@@ -675,12 +727,16 @@ PutReply::PutReply(const PutReply& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  status_ = from.status_;
+  ::memcpy(&timestamp_, &from.timestamp_,
+    static_cast<size_t>(reinterpret_cast<char*>(&status_) -
+    reinterpret_cast<char*>(&timestamp_)) + sizeof(status_));
   // @@protoc_insertion_point(copy_constructor:raft.external.PutReply)
 }
 
 void PutReply::SharedCtor() {
-  status_ = false;
+  ::memset(&timestamp_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&status_) -
+      reinterpret_cast<char*>(&timestamp_)) + sizeof(status_));
 }
 
 PutReply::~PutReply() {
@@ -706,7 +762,9 @@ void PutReply::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  status_ = false;
+  ::memset(&timestamp_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&status_) -
+      reinterpret_cast<char*>(&timestamp_)) + sizeof(status_));
   _internal_metadata_.Clear();
 }
 
@@ -727,6 +785,13 @@ const char* PutReply::_InternalParse(const char* begin, const char* end, void* o
       case 1: {
         if (static_cast<::google::protobuf::uint8>(tag) != 8) goto handle_unusual;
         msg->set_status(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // uint64 timeStamp = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 16) goto handle_unusual;
+        msg->set_timestamp(::google::protobuf::internal::ReadVarint(&ptr));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
@@ -770,6 +835,19 @@ bool PutReply::MergePartialFromCodedStream(
         break;
       }
 
+      // uint64 timeStamp = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (16 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
+                 input, &timestamp_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -802,6 +880,11 @@ void PutReply::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteBool(1, this->status(), output);
   }
 
+  // uint64 timeStamp = 2;
+  if (this->timestamp() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt64(2, this->timestamp(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -818,6 +901,11 @@ void PutReply::SerializeWithCachedSizes(
   // bool status = 1;
   if (this->status() != 0) {
     target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(1, this->status(), target);
+  }
+
+  // uint64 timeStamp = 2;
+  if (this->timestamp() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(2, this->timestamp(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -840,6 +928,13 @@ size_t PutReply::ByteSizeLong() const {
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // uint64 timeStamp = 2;
+  if (this->timestamp() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt64Size(
+        this->timestamp());
+  }
 
   // bool status = 1;
   if (this->status() != 0) {
@@ -873,6 +968,9 @@ void PutReply::MergeFrom(const PutReply& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from.timestamp() != 0) {
+    set_timestamp(from.timestamp());
+  }
   if (from.status() != 0) {
     set_status(from.status());
   }
@@ -903,6 +1001,7 @@ void PutReply::Swap(PutReply* other) {
 void PutReply::InternalSwap(PutReply* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
+  swap(timestamp_, other->timestamp_);
   swap(status_, other->status_);
 }
 
@@ -923,6 +1022,7 @@ class GetRequest::HasBitSetters {
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int GetRequest::kKeyFieldNumber;
 const int GetRequest::kClientFieldNumber;
+const int GetRequest::kTimeStampFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 GetRequest::GetRequest()
@@ -942,6 +1042,7 @@ GetRequest::GetRequest(const GetRequest& from)
   if (from.client().size() > 0) {
     client_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.client_);
   }
+  timestamp_ = from.timestamp_;
   // @@protoc_insertion_point(copy_constructor:raft.external.GetRequest)
 }
 
@@ -950,6 +1051,7 @@ void GetRequest::SharedCtor() {
       &scc_info_GetRequest_external_2eproto.base);
   key_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   client_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  timestamp_ = PROTOBUF_ULONGLONG(0);
 }
 
 GetRequest::~GetRequest() {
@@ -979,6 +1081,7 @@ void GetRequest::Clear() {
 
   key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   client_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  timestamp_ = PROTOBUF_ULONGLONG(0);
   _internal_metadata_.Clear();
 }
 
@@ -1025,6 +1128,13 @@ const char* GetRequest::_InternalParse(const char* begin, const char* end, void*
         GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
         ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
         ptr += size;
+        break;
+      }
+      // uint64 timeStamp = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 24) goto handle_unusual;
+        msg->set_timestamp(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
       default: {
@@ -1091,6 +1201,19 @@ bool GetRequest::MergePartialFromCodedStream(
         break;
       }
 
+      // uint64 timeStamp = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (24 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
+                 input, &timestamp_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -1138,6 +1261,11 @@ void GetRequest::SerializeWithCachedSizes(
       2, this->client(), output);
   }
 
+  // uint64 timeStamp = 3;
+  if (this->timestamp() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt64(3, this->timestamp(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -1171,6 +1299,11 @@ void GetRequest::SerializeWithCachedSizes(
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         2, this->client(), target);
+  }
+
+  // uint64 timeStamp = 3;
+  if (this->timestamp() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(3, this->timestamp(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1208,6 +1341,13 @@ size_t GetRequest::ByteSizeLong() const {
         this->client());
   }
 
+  // uint64 timeStamp = 3;
+  if (this->timestamp() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt64Size(
+        this->timestamp());
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -1243,6 +1383,9 @@ void GetRequest::MergeFrom(const GetRequest& from) {
 
     client_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.client_);
   }
+  if (from.timestamp() != 0) {
+    set_timestamp(from.timestamp());
+  }
 }
 
 void GetRequest::CopyFrom(const ::google::protobuf::Message& from) {
@@ -1274,6 +1417,7 @@ void GetRequest::InternalSwap(GetRequest* other) {
     GetArenaNoVirtual());
   client_.Swap(&other->client_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
+  swap(timestamp_, other->timestamp_);
 }
 
 ::google::protobuf::Metadata GetRequest::GetMetadata() const {
@@ -1293,6 +1437,7 @@ class GetReply::HasBitSetters {
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int GetReply::kStatusFieldNumber;
 const int GetReply::kValueFieldNumber;
+const int GetReply::kTimeStampFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 GetReply::GetReply()
@@ -1308,7 +1453,9 @@ GetReply::GetReply(const GetReply& from)
   if (from.value().size() > 0) {
     value_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.value_);
   }
-  status_ = from.status_;
+  ::memcpy(&timestamp_, &from.timestamp_,
+    static_cast<size_t>(reinterpret_cast<char*>(&status_) -
+    reinterpret_cast<char*>(&timestamp_)) + sizeof(status_));
   // @@protoc_insertion_point(copy_constructor:raft.external.GetReply)
 }
 
@@ -1316,7 +1463,9 @@ void GetReply::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_GetReply_external_2eproto.base);
   value_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  status_ = false;
+  ::memset(&timestamp_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&status_) -
+      reinterpret_cast<char*>(&timestamp_)) + sizeof(status_));
 }
 
 GetReply::~GetReply() {
@@ -1344,7 +1493,9 @@ void GetReply::Clear() {
   (void) cached_has_bits;
 
   value_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  status_ = false;
+  ::memset(&timestamp_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&status_) -
+      reinterpret_cast<char*>(&timestamp_)) + sizeof(status_));
   _internal_metadata_.Clear();
 }
 
@@ -1382,6 +1533,13 @@ const char* GetReply::_InternalParse(const char* begin, const char* end, void* o
         GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
         ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
         ptr += size;
+        break;
+      }
+      // uint64 timeStamp = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 24) goto handle_unusual;
+        msg->set_timestamp(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
       default: {
@@ -1446,6 +1604,19 @@ bool GetReply::MergePartialFromCodedStream(
         break;
       }
 
+      // uint64 timeStamp = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (24 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
+                 input, &timestamp_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -1488,6 +1659,11 @@ void GetReply::SerializeWithCachedSizes(
       2, this->value(), output);
   }
 
+  // uint64 timeStamp = 3;
+  if (this->timestamp() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt64(3, this->timestamp(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -1517,6 +1693,11 @@ void GetReply::SerializeWithCachedSizes(
         2, this->value(), target);
   }
 
+  // uint64 timeStamp = 3;
+  if (this->timestamp() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(3, this->timestamp(), target);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -1543,6 +1724,13 @@ size_t GetReply::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
         this->value());
+  }
+
+  // uint64 timeStamp = 3;
+  if (this->timestamp() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt64Size(
+        this->timestamp());
   }
 
   // bool status = 1;
@@ -1581,6 +1769,9 @@ void GetReply::MergeFrom(const GetReply& from) {
 
     value_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.value_);
   }
+  if (from.timestamp() != 0) {
+    set_timestamp(from.timestamp());
+  }
   if (from.status() != 0) {
     set_status(from.status());
   }
@@ -1613,6 +1804,7 @@ void GetReply::InternalSwap(GetReply* other) {
   _internal_metadata_.Swap(&other->_internal_metadata_);
   value_.Swap(&other->value_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
+  swap(timestamp_, other->timestamp_);
   swap(status_, other->status_);
 }
 

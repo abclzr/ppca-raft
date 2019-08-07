@@ -23,7 +23,7 @@ struct Client::Impl {
 
 namespace raft {
 
-Client::Client(const std::string &filename) : pImpl(std::make_unique<Impl>()) {
+Client::Client(const std::string &filename) : pImpl(std::make_unique<Impl>()), timeStamp(0) {
   namespace pt = boost::property_tree;
   pt::ptree tree;
   pt::read_json(filename, tree);
@@ -49,64 +49,70 @@ decltype(auto) timeFrom(const Tp & tp) {
 }
 
 void Client::Put(std::string key, std::string value, uint64_t timeout) {
-  auto startTimePoint = std::chrono::system_clock::now();
+//  auto startTimePoint = std::chrono::system_clock::now();
+//
+//  while ((uint64_t)timeFrom(startTimePoint) <= timeout) {
+    while (true) {
+        auto &stub = pImpl->stubs[pImpl->cur % pImpl->stubs.size()];
+        grpc::ClientContext ctx;
+        auto startTimePoint = std::chrono::system_clock::now();
+        ctx.set_deadline(startTimePoint + std::chrono::milliseconds(timeout));
+        ctx.set_idempotent(true);
 
-  while ((uint64_t)timeFrom(startTimePoint) <= timeout) {
-    auto & stub = pImpl->stubs[pImpl->cur % pImpl->stubs.size()];
-    grpc::ClientContext ctx;
-    ctx.set_deadline(startTimePoint + std::chrono::milliseconds(timeout));
-    ctx.set_idempotent(true);
-
-    external::PutRequest request;
-    request.set_key(key);
-    request.set_value(value);
-    request.set_client(local_address);
-    external::Reply reply;
-    auto status = stub->Put(&ctx, request, &reply);
-
-    if (status.ok()) {
+        external::PutRequest request;
+        request.set_key(key);
+        request.set_value(value);
+        request.set_client(local_address);
+        request.set_timestamp(++timeStamp);
+        external::Reply reply;
         boost::unique_lock<boost::mutex> lock(mu);
-        auto result = cv.wait_for(lock, boost::chrono::milliseconds(100));
-        if (result == boost::cv_status::no_timeout) {
-            return;
-        } else {
-            pImpl->cur++;
-            continue;
+        auto status = stub->Put(&ctx, request, &reply);
+
+        if (status.ok()) {
+            auto result = cv.wait_for(lock, boost::chrono::milliseconds(100));
+            if (result == boost::cv_status::no_timeout) {
+                return;
+            } else {
+                pImpl->cur++;
+                continue;
+            }
         }
+        pImpl->cur++;
     }
-    pImpl->cur++;
-  }
 
   throw RequestTimeout();
 }
 
 std::string Client::Get(std::string key, uint64_t timeout) {
-  auto startTimePoint = std::chrono::system_clock::now();
+//  auto startTimePoint = std::chrono::system_clock::now();
+//
+//  while ((uint64_t)timeFrom(startTimePoint) <= timeout) {
+    while (true) {
+        auto &stub = pImpl->stubs[pImpl->cur % pImpl->stubs.size()];
+        grpc::ClientContext ctx;
+        auto startTimePoint = std::chrono::system_clock::now();
+        ctx.set_deadline(startTimePoint + std::chrono::milliseconds(timeout));
+        ctx.set_idempotent(true);
 
-  while ((uint64_t)timeFrom(startTimePoint) <= timeout) {
-    auto & stub = pImpl->stubs[pImpl->cur % pImpl->stubs.size()];
-    grpc::ClientContext ctx;
-    ctx.set_deadline(startTimePoint + std::chrono::milliseconds(timeout));
-    ctx.set_idempotent(true);
-
-    external::GetRequest request;
-    request.set_key(key);
-    request.set_client(local_address);
-    external::Reply reply;
-    auto status = stub->Get(&ctx, request, &reply);
-
-    if (status.ok()) {
+        external::GetRequest request;
+        request.set_key(key);
+        request.set_client(local_address);
+        request.set_timestamp(++timeStamp);
+        external::Reply reply;
         boost::unique_lock<boost::mutex> lock(mu);
-        auto result = cv.wait_for(lock, boost::chrono::milliseconds(100));
-        if (result == boost::cv_status::no_timeout) {
-            return "";
-        } else {
-            pImpl->cur++;
-            continue;
+        auto status = stub->Get(&ctx, request, &reply);
+
+        if (status.ok()) {
+            auto result = cv.wait_for(lock, boost::chrono::milliseconds(100));
+            if (result == boost::cv_status::no_timeout) {
+                return "";
+            } else {
+                pImpl->cur++;
+                continue;
+            }
         }
+        pImpl->cur++;
     }
-    pImpl->cur++;
-  }
 
   throw RequestTimeout();
 }
@@ -138,10 +144,14 @@ std::string Client::Get(std::string key, uint64_t timeout) {
     }
 
     void Client::replyput(const external::PutReply *request, external::Reply *response) {
-        cv.notify_one();
+        boost::lock_guard<boost::mutex> lock(mu);
+        if (request->timestamp() == timeStamp)
+            cv.notify_one();
     }
 
     void Client::replyget(const external::GetReply *request, external::Reply *response) {
+        boost::lock_guard<boost::mutex> lock(mu);
+        if (request->timestamp() != timeStamp) return;
         std::cout << request->value() << std::endl;
         std::cerr << "Client Received : " << request->value() << std::endl;
         cv.notify_one();

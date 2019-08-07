@@ -6,20 +6,24 @@ message PutRequest {
   string key = 1;
   string value = 2;
   string client = 3;
+  uint64 timeStamp = 4;
 }
 
 message PutReply {
   bool status = 1;
+  uint64 timeStamp = 2;
 }
 
 message GetRequest {
   string key = 1;
   string client = 2;
+  uint64 timeStamp = 3;
 }
 
 message GetReply {
   bool status = 1;
   string value = 2;
+  uint64 timeStamp = 3;
 }
 
 message Reply {

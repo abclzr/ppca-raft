@@ -50,12 +50,14 @@ namespace raft {
             std::string key;
             std::string value;
             std::string client;
+            uint64_t timestamp;
             explicit Put(const external::PutRequest *);
         } *put;
 
         struct Get {
             std::string key;
             std::string client;
+            uint64_t timestamp;
             explicit Get(const external::GetRequest *);
         } *get;
 
