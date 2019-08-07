@@ -14,10 +14,14 @@ int main(int argc, char *argv[]) {
     raft::Client client(std::string(CMAKE_SOURCE_DIR) + "/cmake-build-debug/example/ClientConfig" + std::string(argv[1]) + ".json");
     client.Run();
 
+    if (std::string(argv[1]) == "0") {
+        std::cerr << "0 yes" << std::endl;
+    }
+
     std::string op, k, v;
     uint32_t cnt = 0;
     while (std::cin.peek() != EOF) {
-        std::cerr << "ID : " << ++cnt << std::endl;
+        if (std::string(argv[1]) == "0") std::cerr << "ID : " << ++cnt << std::endl;
         std::cin >> op;
         if (op == "put") {
             std::cin >> k >> v;
